@@ -1,0 +1,41 @@
+:root {
+  --dark: #0426e9;
+  --dark-x: #1e2126;
+  --light: #ffffff;
+  --black:#000;
+}
+
+.bg-dark {
+  background-color: var(--dark) !important ;
+}
+
+body {
+  font-family: "League Spartan", sans-serif;
+  font-weight: 300;
+  color:var(--black);
+
+}
+
+.btn {
+    min-height: 3.125rem ;
+    line-height: initial;
+}
+
+
+
+.carru {
+    max-width: 720px;
+    max-height: 900px;
+
+}
+.cartop{
+    margin-top: 30px;
+}
+
+.imgperfil {
+  border-radius: 50%;
+
+}
+.perfi img {
+  width: 600px;
+}
