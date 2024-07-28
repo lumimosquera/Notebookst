@@ -1,15 +1,16 @@
-
 <?php
 
 $dbhost = "localhost";
 $dbuser = "root";
-$dbpass = "";
-$dbname = "notbookstbd";
+$dbpassword = "";
+$database = "notbookstbd";
 
-$conn = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname);
-
-if(!$conn)
-{
-	die("No hay conexion:" .mysqli_connect_error());
+try {
+    $pdo = new PDO("mysql:host=$dbhost;dbname=$database;charset=utf8", $dbuser, $dbpassword);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo 'Error de conexión: ' . $e->getMessage();
+    exit();
 }
+
 ?>

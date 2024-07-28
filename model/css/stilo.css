@@ -1,0 +1,71 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box
+
+}
+
+
+
+:root {
+  --dark: #0426e9;
+  --dark-x: #1e2126;
+  --light: #ffffff;
+  --black:#000;
+  --color: #33333330;
+}
+
+.bg-dark {
+  background-color: var(--dark) !important ;
+}
+
+body {
+  font-family: "League Spartan", sans-serif;
+  font-weight: 300;
+  color:var(--black);
+
+}
+
+.btn {
+    min-height: 3.125rem ;
+    line-height: initial;
+}
+
+
+
+.carru {
+    max-width: 720px;
+    max-height: 900px;
+
+}
+.cartop{
+    margin-top: 30px;
+}
+
+.imgperfil {
+  border-radius: 50%;
+
+}
+.perfi img {
+  width: 600px;
+}
+
+
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.footer a {
+  color: #fff;
+  text-decoration: none;
+  margin: 0 10px; }
+
+
