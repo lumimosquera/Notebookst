@@ -19,16 +19,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $id_usuario = $_SESSION['user_id'];
         $nombre_materia = trim($_POST['nombre']); // Usa trim() para eliminar espacios en blanco
 
+        // Función para generar un color hexadecimal aleatorio
+        function getRandomColor() {
+            return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+        }
+
+        // Generar color
+        $color = getRandomColor();
+
         // Validar datos de entrada
         if (empty($nombre_materia)) {
             $message = "El nombre de la materia es requerido.";
             $alert_type = "alert-error";
         } else {
             try {
-                $sql = "INSERT INTO materias (nombre_materia, id_usuario) VALUES (:nombre_materia, :id_usuario)";
+                $sql = "INSERT INTO materias (nombre_materia, id_usuario, color) VALUES (:nombre_materia, :id_usuario, :color)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(':nombre_materia', $nombre_materia);
                 $stmt->bindParam(':id_usuario', $id_usuario);
+                $stmt->bindParam(':color', $color);
                 $stmt->execute();
 
                 $message = "Materia creada exitosamente";
@@ -45,21 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-
-// Función para generar un color hexadecimal aleatorio
-function getRandomColor() {
-    return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
-}
 ob_end_flush();
-
-
 
 // Mostrar materias
 $id_usuario = $_SESSION['user_id'];
 
 try {
     // Prepara y ejecuta la consulta
-    $sql = "SELECT nombre_materia FROM materias WHERE id_usuario = :id_usuario";
+    $sql = "SELECT nombre_materia, color FROM materias WHERE id_usuario = :id_usuario";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
     $stmt->execute();
@@ -73,4 +75,5 @@ try {
 }
 ?>
 
+<!-- Aquí puedes usar el color almacenado para cada materia -->
 

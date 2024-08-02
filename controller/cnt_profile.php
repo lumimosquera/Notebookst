@@ -1,55 +1,83 @@
 <?php
 
-
-
 require '../model/conexion.php';
 
+$mensaje = array(); // aquí se almacenan los mensajes de alerta
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $mensaje = ""; // Variable para almacenar los mensajes de error o éxito
-    
-    // Obtener los datos del formulario
-    $nombre = $_POST["nombre"];
-    $usuario = $_POST["usuario"];
-    $correo = $_POST["correo"];
-    
-    // Validar y manejar la imagen
-    if ($_FILES["imagen"]["name"]) {
-        $imagen_nombre = $_FILES["imagen"]["name"];
-        $imagen_temp = $_FILES["imagen"]["tmp_name"];
-        $imagen_tamano = $_FILES["imagen"]["size"];
-        $imagen_tipo = $_FILES["imagen"]["type"];
-        
-        // Validar el formato y tamaño de la imagen
-        $formatos_permitidos = array("image/jpeg", "image/png");
-        $tamano_maximo = 5 * 1024 * 1024; // 5 MB
-        
-        if (in_array($imagen_tipo, $formatos_permitidos) && $imagen_tamano <= $tamano_maximo) {
-            $ruta_destino = "../ruta/de/destino/" . $imagen_nombre;
-            
-            // Mover la imagen al servidor
-            if (move_uploaded_file($imagen_temp, $ruta_destino)) {
-                // Guardar la ruta en la base de datos
-                // Aquí debes usar tu lógica de conexión y ejecución de consulta SQL
-                // Ejemplo: $consulta = "UPDATE usuarios SET imagen = '$ruta_destino' WHERE usuario = '$usuario'";
-                // Ejecutar la consulta y manejar cualquier error
-                
-                $mensaje = "Imagen subida y datos actualizados correctamente.";
-            } else {
-                $mensaje = "Error al subir la imagen.";
-            }
+if (isset($_SESSION['id']) && isset($_SESSION['nombre'])) {
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $nombre = $_POST['nombre'] ?? '';
+        $usuario = $_POST['usuario'] ?? '';
+        $old_pp = $_POST['old_pp'] ?? '';
+        $id = $_SESSION['id'];
+
+        if (empty($nombre)) {
+            $mensaje[] = "El nombre completo es obligatorio";
+        } else if (empty($usuario)) {
+            $mensaje[] = "El nombre de usuario es obligatorio";
         } else {
-            $mensaje = "Formato de imagen no válido o tamaño excede el límite.";
+            if (isset($_FILES['imagen']['name']) && !empty($_FILES['imagen']['name'])) {
+                $img_name = $_FILES['imagen']['name'];
+                $tmp_name = $_FILES['imagen']['tmp_name'];
+                $error = $_FILES['imagen']['error'];
+
+                if ($error === 0) {
+                    $img_ex = pathinfo($img_name, PATHINFO_EXTENSION);
+                    $img_ex_to_lc = strtolower($img_ex);
+
+                    $allowed_exs = array('jpg', 'jpeg', 'png');
+                    if (in_array($img_ex_to_lc, $allowed_exs)) {
+                        // Asegurarse de que el nombre de la imagen sea único
+                        $img_upload_path = '../asset/img/user/' . $img_name;
+                        $counter = 1;
+                        while (file_exists($img_upload_path)) {
+                            $img_name = pathinfo($img_name, PATHINFO_FILENAME) . "($counter)." . $img_ex_to_lc;
+                            $img_upload_path = '../asset/img/user/' . $img_name;
+                            $counter++;
+                        }
+
+                        move_uploaded_file($tmp_name, $img_upload_path);
+
+                        // URL de la imagen
+                        $img_url = '../asset/img/user/' . $img_name;
+
+                        // Delete old profile pic if exists
+                        $old_pp_des = "../asset/img/user/$old_pp";
+                        if (file_exists($old_pp_des)) {
+                            unlink($old_pp_des);
+                        }
+
+                        // Update the Database
+                        $sql = "UPDATE usuarios SET nombre=?, usuario=?, imagen=? WHERE id=?";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$nombre, $usuario, $img_url, $id]);
+
+                        $mensaje[] = "<strong>¡Éxito!</strong> Tu cuenta ha sido actualizada exitosamente";
+                        $_SESSION['nombre'] = $nombre;
+                    } else {
+                        $mensaje[] = "No puedes subir archivos de este tipo";
+                    }
+                } else {
+                    $mensaje[] = "¡Ocurrió un error desconocido!";
+                }
+            } else {
+                // If no new profile picture is uploaded
+                $sql = "UPDATE usuarios SET nombre=?, usuario=? WHERE id=?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$nombre, $usuario, $id]);
+
+                $mensaje[] = "<strong>¡Éxito!</strong> Tu cuenta ha sido actualizada exitosamente";
+                $_SESSION['nombre'] = $nombre;
+            }
         }
     } else {
-        // No se subió una nueva imagen, solo actualizar los otros datos en la base de datos
-        // Aquí puedes realizar la actualización de los campos nombre, usuario y correo en la base de datos
-        // Ejemplo: $consulta = "UPDATE usuarios SET nombre = '$nombre', usuario = '$usuario', correo = '$correo' WHERE usuario = '$usuario'";
-        // Ejecutar la consulta y manejar cualquier error
-        
-        $mensaje = "Datos actualizados correctamente.";
+        $mensaje[] = "Datos inválidos";
     }
+} else {
+    $mensaje[] = "No estás autenticado. Por favor, inicia sesión.";
 }
-
-
 ?>
+
+
+

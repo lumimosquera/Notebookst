@@ -55,10 +55,11 @@ include "../controller/cnt_profile.php";
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="" method="POST" enctype="multipart/form-data">
+
+                                    <form action="../controller/cnt_profile.php" method="POST" enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label for="name">Nombre</label>
-                                            <input type="text" class="form-control" id="name" name="nombre" placeholder="Nombre">
+                                            <input type="text" class="form-control" id="name" name="nombre" placeholder="Nombre" value="<?php echo $nombre_usuario; ?>">
                                         </div>
                                         <div class="form-group">
                                             <label for="image">Imagen de perfil</label>
@@ -69,17 +70,17 @@ include "../controller/cnt_profile.php";
                                         </div>
                                         <div class="form-group">
                                             <label for="username">Nombre de usuario</label>
-                                            <input type="text" class="form-control" id="username" name="usuario" placeholder="Nombre de usuario">
+                                            <input type="text" class="form-control" id="username" name="usuario" placeholder="Nombre de usuario" value="<?php echo $_SESSION['usuario_usuario']; ?>">
                                         </div>
                                         <div class="form-group">
                                             <label for="correo"><i class="bi bi-envelope-at"></i> Correo Electrónico:</label>
-                                            <input type="email" class="form-control" id="correo" name="correo" placeholder="<?php echo $_SESSION['correo_usuario']; ?>">
+                                            <input type="email" class="form-control" id="correo" name="correo" placeholder="" value="<?php echo $_SESSION['correo_usuario']; ?>">
                                         </div>
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                    <input type="submit" value="Guardar" class="btn btn-primary"></input>
+                                 
+                                <button type="submit" class="btn btn-primary botin w-100">Registrarme</button>
                                 </div>
                             </div>
                         </div>
@@ -96,6 +97,29 @@ include "../controller/cnt_profile.php";
 </body>
 
 </html>
+
+<!-- JavaScript to handle modal -->
+<script>
+  var modal = document.getElementById("updateUserModal");
+  var span = document.getElementsByClassName("close")[0];
+
+  // Open the modal
+  function openModal() {
+    modal.style.display = "block";
+  }
+
+  // Close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // Close the modal if the user clicks outside of it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
 
 <?php include_once 'footer.php'; ?>
 <script>
