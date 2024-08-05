@@ -1,9 +1,6 @@
 <?php
 include "../controller/cnt_materia.php";
-// En tu página principal
-if (isset($_POST['id_materia'])) {
-    include '../controller/eliminar_materia.php';
-}
+
 
 ?>
 
@@ -15,11 +12,10 @@ if (isset($_POST['id_materia'])) {
         <div class="card border-0">
             <div class="card-body">
                 <?php if(!empty($message)): ?>
-                <div class="alert alert-primary" role="alert">
-                    <p><i class="fa-solid fa-triangle-exclamation"></i> <?= $message ?></p>
+                <div id="tempAlert" class="alert alert-success" role="alert">
+                    <p><i class="fa-solid fa-check-circle"></i> <?= $message ?></p>
                 </div>
                 <?php endif; ?>
-
                 <h1 class="card-title">Crear Materia</h1>
                 <form action="" method="post">
                     <div class="input-group mb-3">
@@ -34,40 +30,84 @@ if (isset($_POST['id_materia'])) {
         </div>
     </div>
 
-    <div class="container mt-3">
-        <div class="row">
-            <?php foreach ($materias as $materia): ?>
-            <div class="col-lg-3 col-6">
-                <!-- Card Container -->
-                <div class="card-container">
-                    <!-- Begin::Small Box Widget -->
-                    <div class="small-box"
-                        style="background-color: <?php echo htmlspecialchars($materia['color']); ?>;">
-                        <form method="post" action="../controller/eliminar_materia.php" class="d-inline eliminar">
- 
-    <button class="delete-btn" type="submit"><i class="fas fa-trash-alt"></i></button>
-</form>
+
+    <script>
+    // Espera a que el DOM se cargue completamente
+    document.addEventListener("DOMContentLoaded", function() {
+        // Selecciona el elemento de la alerta temporal
+        var tempAlert = document.getElementById('tempAlert');
+
+        // Verifica si el elemento existe
+        if (tempAlert) {
+            // Configura un temporizador para eliminar la alerta después de 2 segundos (2000 ms)
+            setTimeout(function() {
+                tempAlert.style.display = 'none'; // Oculta la alerta
+            }, 800); // 1000 ms = 1 segundos
+        }
+    });
+    </script>
 
 
+<div class="container mt-3">
+    <div class="row">
+        <?php foreach ($materias as $materia): ?>
+        <div class="col-lg-3 col-6">
+            <!-- Card Container -->
+            <div class="card-container">
+                <!-- Begin::Small Box Widget -->
+                <div class="small-box"
+                    style="background-color: <?php echo htmlspecialchars($materia['color']); ?>;">
 
-                        <div class="inner link-light">
-                            <h3><?php echo htmlspecialchars($materia['nombre_materia']); ?></h3>
-                        </div>
-                        <a href="#"
-                            class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                            Más Info <i class="bi bi-link-45deg"></i>
-                        </a>
+                    <form method="post" action="../controller/eliminar_materia.php" class="d-inline eliminar"
+                        onsubmit="return confirmDelete(event, this)">
+                        <input type="hidden" name="id"
+                            value="<?php echo htmlspecialchars($materia['id_materia']); ?>">
+                        <button class="delete-btn" type="submit"><i class="fas fa-trash-alt"></i></button>
+                    </form>
+
+                    <div class="inner link-light">
+                        <h3><?php echo htmlspecialchars($materia['nombre_materia']); ?></h3>
                     </div>
-                    <!-- End::Small Box Widget -->
+                    <a href="./materia/detalle_materia.php?id_materia=<?php echo htmlspecialchars($materia['id_materia']); ?>"
+                        class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                        Más Info <i class="bi bi-link-45deg"></i>
+                    </a>
                 </div>
+                <!-- End::Small Box Widget -->
             </div>
-            <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
     </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    function confirmDelete(event, form) {
+        event.preventDefault(); // Detener el envío del formulario
+
+        Swal.fire({
+            title: '¿Estás seguro de eliminar esta materia?',
+            text: "No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Enviar el formulario si el usuario confirma
+            }
+        });
+
+        return false; // Evitar el envío del formulario por defecto
+    }
+    </script>
 
 
-    <!-- Asegúrate de incluir Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Incluir SweetAlert2 desde un CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 

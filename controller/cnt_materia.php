@@ -55,13 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 ob_end_flush();
-
 // Mostrar materias
 $id_usuario = $_SESSION['user_id'];
 
 try {
     // Prepara y ejecuta la consulta
-    $sql = "SELECT nombre_materia, color FROM materias WHERE id_usuario = :id_usuario";
+    $sql = "SELECT id_materia, nombre_materia, color FROM materias WHERE id_usuario = :id_usuario";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
     $stmt->execute();
@@ -73,6 +72,8 @@ try {
     echo "<div class='alert alert-danger'>$message</div>";
     exit();
 }
+
+
 ?>
 
 <!-- Aquí puedes usar el color almacenado para cada materia -->

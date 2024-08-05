@@ -19,18 +19,11 @@ body {
 }
 
 /* Estilos del footer */
-footer {
-  background-color: #f5f5f5;
-  padding: 10px 0;
-  text-align: center;
-  position: sticky;
-  bottom: 0;
-}
 
 .custom-dropdown-menu {
   width: 250px;
   height: 250px;
-  overflow-y: auto; /* Agregar desplazamiento si el contenido excede la altura */
+
 }
 
 .custom-image {
@@ -55,11 +48,12 @@ footer {
     #064b66,
     #00008b
   ); /* Azul claro a azul oscuro */
-  padding: 20px;
+
   color: white; /* Ajusta el color del texto si es necesario */
   text-align: center; /* Centra el texto dentro del banner */
   border-radius: 5px; /* Añade bordes redondeados si lo deseas */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra para dar profundidad */
+  
 }
 .mini-banner h6 {
   color: white;
@@ -102,34 +96,27 @@ footer {
 
 /* PROFILE*/
 
-.custom-image-profile {
-  width: 138px;
-  height: 184px;
+.img-thumbnail {
   object-fit: cover;
+  border: 3px solid #fff;
+}
+.card-header {
+  background-image: url('https://via.placeholder.com/850x250'); /* Placeholder image, replace with your background */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.card-header h4 {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 
-.preview-image {
-  max-width: 30%;
-  height: auto;
-  margin-top: 10px;
-  border: 3px solid #ccc;
-  border-radius: 10%;
-  display: block;
-  margin: 0 auto;
-}
-.fons-image {
-  background: linear-gradient(
-    to right,
-    #064b66,
-    #050533
-  ); /* Azul claro a azul oscuro */
-  color: white; /* Ajusta el color del texto si es necesario */
-  text-align: center; /* Centra el texto dentro del banner */
-  border-radius: 5px; /* Añade bordes redondeados si lo deseas */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra para dar profundidad */
-  width: 100%;
-  height: 220px; /* Establece la altura al 100% del viewport height */
-}
 
 /* Media queries para dispositivos pequeños */
 @media (max-width: 576px) {
@@ -169,6 +156,9 @@ footer {
 }
 
 /* FIN PROFILE*/
+
+
+
 
 /* CARD DE VISTA DE LAS MATERIAS*/
 .small-box {

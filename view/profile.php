@@ -7,86 +7,77 @@ include "../controller/cnt_profile.php";
 ?>
 
 <body>
-
-<div class="container">
-    <div class="row px-lg-3 pt-lg-4 p-2 align-items-center">
-        <div class="col-md-12 col-lg-6 mx-auto">
-            <div class="card card-deck">
-                <div class="fons fons-image d-flex justify-content-center bg-dark">
-                    <img class="m-4 custom-image-profile" alt="..." src="<?php echo $imagen_usuario ? $imagen_usuario : '../assets/img/default-user.png'; ?>">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-dark text-white">
+                    <img class="rounded-circle img-thumbnail my-3" alt="Profile Image"
+                        src="<?php echo $imagen_usuario ? $imagen_usuario : '../assets/img/default-user.png'; ?>" width="150" height="150">
+                    <h4 class="card-title mb-0"><?php echo $nombre_usuario; ?></h4>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-text">
-                        <i class="bi bi-person-badge"></i>
-                        <span class="ml-2"><?php echo $nombre_usuario; ?></span>
-                    </h5>
-                    <table class="table table-no-margin table-no-border table-no-lines">
-                        <thead>
-                            <tr>
-                                <th class="col-md-6">
-                                    <i class="fa-solid fa-user fa-xl" style="color: #35a4e9;"></i>
-                                    <span class="ml-2">Usuario:</span>
-                                </th>
-                                <th class="col-md-6"><?php echo $_SESSION['usuario_usuario']; ?></th>
-                            </tr>
-                        </thead>
+                    <table class="table">
                         <tbody>
                             <tr>
-                                <th class="col-md-6">
-                                    <i class="fa-solid fa-envelope fa-xl" style="color: #35a4e9;"></i>
-                                    <span class="ml-2">Correo:</span>
-                                </th>
-                                <th class="col-md-6"><?php echo $_SESSION['correo_usuario']; ?></th>
+                                <td class="font-weight-bold"><i class="fa-solid fa-user fa-xl" style="color: #35a4e9;"></i> Usuario:</td>
+                                <td><?php echo $_SESSION['usuario_usuario']; ?></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-bold"><i class="fa-solid fa-envelope fa-xl" style="color: #35a4e9;"></i> Correo:</td>
+                                <td><?php echo $_SESSION['correo_usuario']; ?></td>
                             </tr>
                         </tbody>
                     </table>
-                    <!-- boton modal-->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update-user-modal">
-                        Actualizar perfil
-                    </button>
-
-                    <div class="modal fade" id="update-user-modal" tabindex="-1" role="dialog" aria-labelledby="update-user-modal-label" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="update-user-modal-label">Actualizar perfil</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-
-                                    <form action="../controller/cnt_profile.php" method="POST" enctype="multipart/form-data">
-                                        <div class="form-group">
-                                            <label for="name">Nombre</label>
-                                            <input type="text" class="form-control" id="name" name="nombre" placeholder="Nombre" value="<?php echo $nombre_usuario; ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="image">Imagen de perfil</label>
-                                            <input type="file" class="form-control" id="imagen" name="imagen" onchange="readURL(this);">
-                                        </div>
-                                        <div class="form-group text-center">
-                                            <img id="preview" class="preview-image" src="<?php echo $imagen_usuario ? $imagen_usuario : '../assets/img/default-user.png'; ?>" alt="" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="username">Nombre de usuario</label>
-                                            <input type="text" class="form-control" id="username" name="usuario" placeholder="Nombre de usuario" value="<?php echo $_SESSION['usuario_usuario']; ?>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="correo"><i class="bi bi-envelope-at"></i> Correo Electrónico:</label>
-                                            <input type="email" class="form-control" id="correo" name="correo" placeholder="" value="<?php echo $_SESSION['correo_usuario']; ?>">
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                 
-                                <button type="submit" class="btn btn-primary botin w-100">Registrarme</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="text-center">
+                        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#update-user-modal">
+                        <i class="bi bi-pencil-square"></i> Actualizar perfil
+                        </button>
+                        <button type="button" class="btn btn-secondary mt-3" data-toggle="modal" data-target="#change-password-modal">
+                        <i class="bi bi-pencil-square"></i> Cambiar contraseña
+                        </button>
                     </div>
-                    <!--fin del boton-->
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para actualizar perfil -->
+<div class="modal fade" id="update-user-modal" tabindex="-1" role="dialog" aria-labelledby="update-user-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="update-user-modal-label">Actualizar perfil</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="../controller/cnt_profile.php" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Nombre</label>
+                        <input type="text" class="form-control" id="name" name="nombre" placeholder="Nombre" value="<?php echo $nombre_usuario; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Imagen de perfil</label>
+                        <input type="file" class="form-control" id="imagen" name="imagen" onchange="readURL(this);">
+                    </div>
+                    <div class="form-group text-center">
+                        <img id="preview" class="img-thumbnail mt-3" src="<?php echo $imagen_usuario ? $imagen_usuario : '../assets/img/default-user.png'; ?>" alt="Profile Image" width="150" height="150">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="username" name="usuario" placeholder="Nombre de usuario" value="<?php echo $_SESSION['usuario_usuario']; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="correo"><i class="bi bi-envelope-at"></i> Correo Electrónico:</label>
+                        <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo Electrónico" value="<?php echo $_SESSION['correo_usuario']; ?>">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -94,9 +85,9 @@ include "../controller/cnt_profile.php";
 
 
 
-</body>
 
-</html>
+
+
 
 <!-- JavaScript to handle modal -->
 <script>
