@@ -19,14 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $id_usuario = $_SESSION['user_id'];
         $nombre_materia = trim($_POST['nombre']); // Usa trim() para eliminar espacios en blanco
 
-        // Función para generar un color hexadecimal aleatorio
-        function getRandomColor() {
+        function getRandomHexColor() {
             return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
         }
-
-        // Generar color
-        $color = getRandomColor();
-
+        
+            // Función para generar un gradiente lineal aleatorio
+            function getRandomGradient() {
+                $color1 = getRandomHexColor();
+                $color2 = getRandomHexColor();
+                return "linear-gradient(45deg, $color1, $color2)";
+            }
+            // Generar color de gradiente
+            $color = getRandomGradient();
+                
         // Validar datos de entrada
         if (empty($nombre_materia)) {
             $message = "El nombre de la materia es requerido.";
@@ -52,6 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $message = "El nombre de la materia no está definido.";
         $alert_type = "alert-error";
     }
+    echo "<script type='text/javascript'>
+    window.location.href = window.location.href;
+  </script>";
+exit();
 }
 
 ob_end_flush();
@@ -74,7 +83,21 @@ try {
 }
 
 
+
+$id_usuario = $_SESSION['user_id']; // Obtén el ID del usuario actual desde la sesión
+
+// Consulta para obtener materias con el conteo de tareas asociadas, filtrando por id_usuario
+$query = $pdo->prepare("
+    SELECT m.*, COUNT(t.id_tarea) as tareas_count
+    FROM materias m
+    LEFT JOIN tareas t ON m.id_materia = t.id_materia
+    WHERE m.id_usuario = :id_usuario
+    GROUP BY m.id_materia
+");
+$query->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+$query->execute();
+$materias = $query->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!-- Aquí puedes usar el color almacenado para cada materia -->
-

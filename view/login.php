@@ -113,10 +113,10 @@ include "../controller/cnt_login.php"
                     </div>
                     <div class="carousel-inner cartop m-lg-5 w-100 p-lg-5 pt-lg-3  ">
                         <div class="carousel-item active">
-                            <img src="../asset/img/s1.jpeg" class=" w-75 carru" alt="...">
+                            <img src="../asset/img/LN.jpeg" class=" w-75 carru" alt="...">
                         </div>
                         <div class="carousel-item">
-                            <img src="../asset/img/s2.jpeg" class=" w-75 carru" alt="...">
+                            <img src="../asset/img/ln2.jpeg" class=" w-75 carru" alt="...">
                         </div>
                         <div class="carousel-item">
                             <img src="../asset/img/s3.png" class="w-75 carru" alt="...">

@@ -4,8 +4,12 @@ include "../controller/cnt_materia.php";
 
 ?>
 
-
+<style>
+  
+  </style>
 <body>
+
+
 
 
     <div class="container mt-3">
@@ -24,7 +28,7 @@ include "../controller/cnt_materia.php";
                             required>
                     </div>
                     <input type="hidden" name="id_usuario" value="<?= $_SESSION['user_id']; ?>">
-                    <button type="submit" class="btn btn-primary">Crear</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-journal-plus"></i> Crear</button>
                 </form>
             </div>
         </div>
@@ -48,37 +52,34 @@ include "../controller/cnt_materia.php";
     </script>
 
 
-<div class="container mt-3">
+
+
+
+
+<div class="container mt-4">
     <div class="row">
         <?php foreach ($materias as $materia): ?>
-        <div class="col-lg-3 col-6">
-            <!-- Card Container -->
-            <div class="card-container">
-                <!-- Begin::Small Box Widget -->
-                <div class="small-box"
-                    style="background-color: <?php echo htmlspecialchars($materia['color']); ?>;">
-
-                    <form method="post" action="../controller/eliminar_materia.php" class="d-inline eliminar"
-                        onsubmit="return confirmDelete(event, this)">
-                        <input type="hidden" name="id"
-                            value="<?php echo htmlspecialchars($materia['id_materia']); ?>">
-                        <button class="delete-btn" type="submit"><i class="fas fa-trash-alt"></i></button>
-                    </form>
-
-                    <div class="inner link-light">
-                        <h3><?php echo htmlspecialchars($materia['nombre_materia']); ?></h3>
+            <div class="col-md-4 col-xl-4 mb-4">
+                <div class="card small-box shadow-sm" style="background: <?php echo htmlspecialchars($materia['color']); ?>; border-radius: 15px;">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title mb-0 text-white"><?php echo htmlspecialchars($materia['nombre_materia']); ?></h5>
+                            <form method="post" action="../controller/eliminar_materia.php" class="d-inline eliminar" onsubmit="return confirmDelete(event, this)">
+                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($materia['id_materia']); ?>">
+                                <button class="btn btn-sm btn-danger delete-btn" type="submit"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </div>
+                        <h2 class="text-right text-white mb-4"><i class="bi bi-journal-bookmark-fill"></i><span> <?php echo htmlspecialchars($materia['tareas_count']); ?></span></h2>  
+                        <div class="mt-auto">
+                            <a href="detalle_materia.php?id_materia=<?php echo htmlspecialchars($materia['id_materia']); ?>" class="btn btn-light btn-sm stretched-link"> <i class="bi bi-info-circle"></i> Más Info <i class="bi bi-link-45deg"></i></a>
+                        </div>
                     </div>
-                    <a href="./materia/detalle_materia.php?id_materia=<?php echo htmlspecialchars($materia['id_materia']); ?>"
-                        class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        Más Info <i class="bi bi-link-45deg"></i>
-                    </a>
                 </div>
-                <!-- End::Small Box Widget -->
             </div>
-        </div>
         <?php endforeach; ?>
     </div>
 </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -87,7 +88,7 @@ include "../controller/cnt_materia.php";
 
         Swal.fire({
             title: '¿Estás seguro de eliminar esta materia?',
-            text: "No podrás revertir esto!",
+            text: "¿Estás seguro de que deseas eliminar esta materia y todas sus tareas asociadas?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
