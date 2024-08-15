@@ -59,7 +59,7 @@ $imagen_usuario = $_SESSION['imagen_usuario'];
 
     <!-- Local CSS -->
     <link rel="stylesheet" href="../asset/css/adminlte.css">
-    <link rel="stylesheet" href="../asset/css/midesing.css">
+    <link rel="stylesheet" href="../asset/css/midesingl.css">
     <link rel="stylesheet" href="../asset/css/sb-admin-2.min.css">
 
     <!-- Font Awesome -->
@@ -68,15 +68,16 @@ $imagen_usuario = $_SESSION['imagen_usuario'];
 
     <!-- Popper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-dark-subtle">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="home.php">
                 <i class="bi bi-house-fill"> Inicio</i>
             </a>
-            <a class="navbar-brand" href="home.php">              
+            <a class="navbar-brand" href="tareas.php">              
                 <i class="bi bi-journal-album"> Mis tareas</i>
             </a>
             <!-- Botón de colapso para móviles -->

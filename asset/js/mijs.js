@@ -1,22 +1,40 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var img = document.getElementById('profile-picture');
-    var colorThief = new ColorThief();
+function cambiarEstado(tareaId, nuevoEstado) {
+    // Realizar la solicitud AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "../controller/cnt_tarea.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    img.onload = function () {
-        // Obtener los colores dominantes
-        var dominantColor = colorThief.getColor(img);
-        var palette = colorThief.getPalette(img, 2);
-        var secondaryColor = palette[1] || dominantColor;
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                // Actualizar la insignia (badge) del estado
+                var badge = document.querySelector(`#badge-${tareaId}`);
+                badge.textContent = nuevoEstado;
+                badge.className = `badge badge-pill badge-${getBadgeClass(nuevoEstado)}`;
 
-        // Crear el gradiente
-        var gradient = `linear-gradient(to right, rgb(${dominantColor.join(',')}), rgb(${secondaryColor.join(',')}))`;
-
-        // Aplicar el gradiente al banner
-        document.querySelector('.mini-banner').style.background = gradient;
+                // Mostrar un mensaje de éxito
+                alert(response.message);
+            } else {
+                alert("Error: " + response.message);
+            }
+        }
     };
 
-    // Asegúrate de que la imagen esté cargada
-    if (img.complete) {
-        img.onload();
+    xhr.send("id_tarea=" + encodeURIComponent(tareaId) + "&nuevo_estado=" + encodeURIComponent(nuevoEstado));
+}
+
+function getBadgeClass(estado) {
+    switch(estado) {
+        case 'pendiente':
+            return 'warning';
+        case 'en_proceso':
+            return 'info';
+        case 'completada':
+            return 'success';
+        case 'cancelada':
+            return 'danger';
+        default:
+            return 'secondary';
     }
-});
+}

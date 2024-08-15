@@ -83,7 +83,7 @@ try {
 }
 
 
-
+// CONTEO DE TAREAS
 $id_usuario = $_SESSION['user_id']; // Obtén el ID del usuario actual desde la sesión
 
 // Consulta para obtener materias con el conteo de tareas asociadas, filtrando por id_usuario

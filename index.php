@@ -39,7 +39,10 @@
         overflow: hidden;
         position: relative;
     }
-     
+    
+    .navbar {
+  background-color: #05324c;
+}
     .floating_menu {
     position: fixed;
     bottom: 20px;
@@ -104,6 +107,11 @@
     color: #fff;
   }
 
+/* FOOTER*/
+footer {
+  background-color: #0a141d;
+  color: #eff9ff;
+}
 </style>
     
     
@@ -111,7 +119,7 @@
 
 <body>
     <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark  bg-secondary">
+    <nav class="navbar navbar-expand-lg navbar-dark  ">
         <div class="container">
             <a class="navbar-brand" href="#">Notebookst</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,17 +188,13 @@
 
    
 
-    <!-- Footer 
-    <div class="footer">
-        <p>Todos los derechos reservados &copy; <?php echo date('Y'); ?> Notebook</p>
-        <p>
-            <a href="https://notebookst.com" target="_blank">NotebookST</a>
-            <a href="https://www.example.com" target="_blank">Enlace a otra página</a>
-            <a href="https://www.example2.com" target="_blank">Enlace a otra página</a>
-        </p>
+   
+<footer class=" py-3 mt-auto">
+    <div class="container text-center">
+        <p>Notbookst &copy; 2024. Todos los derechos reservados.</p>
+       <h1></h1>
     </div>
-    -->
-    
+</footer>
 
 
         

@@ -28,7 +28,7 @@ include "../controller/cnt_materia.php";
                             required>
                     </div>
                     <input type="hidden" name="id_usuario" value="<?= $_SESSION['user_id']; ?>">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-journal-plus"></i> Crear</button>
+                    <button type="submit" class="btn bnt-dsing"><i class="bi bi-journal-plus"> Crear</i> </button>
                 </form>
             </div>
         </div>
@@ -71,7 +71,7 @@ include "../controller/cnt_materia.php";
                         </div>
                         <h2 class="text-right text-white mb-4"><i class="bi bi-journal-bookmark-fill"></i><span> <?php echo htmlspecialchars($materia['tareas_count']); ?></span></h2>  
                         <div class="mt-auto">
-                            <a href="detalle_materia.php?id_materia=<?php echo htmlspecialchars($materia['id_materia']); ?>" class="btn btn-light btn-sm stretched-link"> <i class="bi bi-info-circle"></i> Más Info <i class="bi bi-link-45deg"></i></a>
+                            <a href="detalle_materia.php?id_materia=<?php echo htmlspecialchars($materia['id_materia']); ?>" class="btn btn-light btn-sm stretched-link">Más Info <i class="bi bi-arrow-right-circle-fill"></i></a>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 <?php
-// Obtener el id_materia desde la URL de la materia donde estamos
+
 $id_materia = isset($_GET['id_materia']) ? intval($_GET['id_materia']) : 0;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -49,8 +49,12 @@ exit();
 
 
 
-
 ?>
+
+
+
+
+
 
 
 
