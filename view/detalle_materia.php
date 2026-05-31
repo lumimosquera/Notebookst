@@ -1,14 +1,15 @@
 <?php
 include_once 'encabezado.php';
-include "../controller/cnt_tarea.php";
+// Nota: no incluir el controlador que procesa POST aquí, porque `encabezado.php`
+// ya envía salida. En su lugar el formulario enviará a `controller/detalle_materia.php`
+// para que el redirect (PRG) ocurra antes de cualquier output.
 // Conexión a la base de datos
-
 // Obtener el id_materia desde la URL
 $id_materia = isset($_GET['id_materia']) ? intval($_GET['id_materia']) : 0;
 
 if ($id_materia > 0) {
     // Consultar las tareas de la materia seleccionada
-    $query = $pdo->prepare('SELECT * FROM tareas WHERE id_materia = ?');
+    $query = $pdo->prepare('SELECT * FROM tareas WHERE id_materia = ? ORDER BY fecha_cierre ASC, hora_cierre ASC');
     $query->execute([$id_materia]);
     $tareas = $query->fetchAll(PDO::FETCH_ASSOC);
 
@@ -77,7 +78,7 @@ function getBadgeClass($estado) {
                     <div class="modal-body">
                         <!-- CONTENIDO -->
                         <div class="container mt-3">
-                            <form action="" method="post">
+                            <form action="../controller/detalle_materia.php?id_materia=<?php echo $id_materia; ?>" method="post">
                                 <div class="mb-3">
                                     <label for="nombre_tarea" class="form-label">Nombre de la Tarea</label>
                                     <input type="text" id="nombre_tarea" name="nombre_tarea" class="form-control"
@@ -148,6 +149,12 @@ function getBadgeClass($estado) {
                                     <button class="dropdown-item"
                                         onclick="cambiarEstado(<?php echo $tarea['id_tarea']; ?>, 'cancelada')">Cancelada</button>
                                 </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button class="dropdown-item text-danger" onclick='confirmarEliminar(<?php echo $tarea['id_tarea']; ?>, <?php echo json_encode($tarea['nombre_tarea']); ?>)'>
+                                        <i class="bi bi-trash3"></i> Eliminar
+                                    </button>
+                                </li>
                             </ul>
                         </div>
 
@@ -217,3 +224,29 @@ function getBadgeClass($estado) {
 <?php
 include_once 'footer.php';
 ?>
+<!-- Form oculto eliminar tarea -->
+<form id="formEliminar" action="../controller/eliminar_tarea.php" method="post" style="display:none">
+    <input type="hidden" name="id_tarea" id="inputIdTarea">
+    <input type="hidden" name="id_materia" value="<?php echo htmlspecialchars($id_materia); ?>">
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarEliminar(id, nombre) {
+    Swal.fire({
+        title: '¿Eliminar actividad?',
+        text: '"' + nombre + '" será eliminada permanentemente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then(r => {
+        if (r.isConfirmed) {
+            document.getElementById('inputIdTarea').value = id;
+            document.getElementById('formEliminar').submit();
+        }
+    });
+}
+</script>

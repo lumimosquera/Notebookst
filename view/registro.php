@@ -8,244 +8,300 @@ include "../controller/cnt_registro.php"
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro</title>
+    
+    <title>Crear cuenta • Notebookst</title>
     <link rel="icon" href="../asset/img/N.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/stilo.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://kit.fontawesome.com/b02da9335c.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
-    </script>
-
-
+    <link rel="stylesheet" href="../asset/css/notebookst.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-    body {
-        background: #fff;
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-base) 0%, #0f1419 50%, var(--bg-overlay) 100%);
+            position: relative;
+            overflow: hidden;
+        }
 
-    }
+        /* Fondo decorativo */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(17,164,255,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(74,240,200,0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
 
-    .menu i {
-        color: #fff;
-    }
+        .register-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
 
-    .floating_menu {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 999;
-    }
+        .register-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 32px;
+            box-shadow: 0 24px 80px rgba(0,0,0,.6);
+            animation: slideUp 0.6s ease-out;
+        }
 
-    .menu i {
-        color: #fff;
-    }
+        .register-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
 
-    .menu {
-        background-color: #007bff;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+        .register-logo {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: inline-block;
+        }
 
-    .menu:hover {
-        background-color: #0056b3;
-    }
+        .register-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 8px 0;
+            font-family: 'Instrument Serif', serif;
+        }
 
-    .sud_menu {
-        position: absolute;
-        right: 60px;
-        bottom: 0;
-        transform: translateX(100%);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
+        .register-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
 
-    .floating_menu.active .sud_menu {
-        transform: translateX(0);
-        opacity: 1;
-        pointer-events: auto;
-    }
+        .form-group {
+            margin-bottom: 16px;
+        }
 
-    .sud_menu i {
-        font-size: 24px;
-        color: #fff;
-        background-color: #007bff;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+        .btn-register {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--t-std);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
 
-    .sud_menu i:hover {
-        background-color: #0056b3;
-    }
+        .btn-register:hover {
+            background: var(--accent-dim);
+            box-shadow: 0 0 24px rgba(17, 164, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-register i {
+            font-size: 16px;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .register-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--t-fast);
+        }
+
+        .register-footer a:hover {
+            color: var(--accent-dim);
+        }
+
+        .alert-message {
+            background: rgba(252, 92, 125, 0.1);
+            border: 1px solid rgba(252, 92, 125, 0.3);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #fc5c7d;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .alert-message.success {
+            background: rgba(74, 240, 200, 0.1);
+            border-color: rgba(74, 240, 200, 0.3);
+            color: #4af0c8;
+        }
+
+        .alert-message i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .register-panel {
+                padding: 24px;
+            }
+            .register-title {
+                font-size: 20px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 
-<body class="bg-while">
-
-    <section class="w-60">
-        <div class="row g-0 ">
-            <div class="col-lg-7  bg-primary  w-50 d-none d-lg-block overflow-auto">
-                <!--CARRUCEL-->
-
-                <div id="carouselExampleIndicators" class="carousel slide w-100 px-lg-5 pt-lg-4 p-4  "
-                    data-bs-ride="true">
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
-                            class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                            aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                            aria-label="Slide 3"></button>
-                    </div>
-                    <div class="carousel-inner cartop m-lg-5 w-100 p-lg-5 pt-lg-3 ">
-                        <div class="carousel-item active">
-                            <img src="../asset/img/s1.jpeg" class=" w-75 carru" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../asset/img/s2.jpeg" class=" w-75 carru" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../asset/img/s3.png" class="w-75 carru" alt="...">
-                        </div>
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden p">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
+<body>
+    <div class="register-container">
+        <div class="register-panel">
+            <!-- Header -->
+            <div class="register-header">
+                <div class="register-logo"><i class="bi bi-notebook"></i></div>
+                <h1 class="register-title">Crear cuenta</h1>
+                <p class="register-subtitle">Únete a Notebookst hoy</p>
             </div>
 
-            <div class="col-lg-5  flex-column align-items-end min-vh-100  p-lg-4 bg-white">
-                <!--align-items-end min-vh-100-->
-                <!--LOGO-->
-                <div class="px-lg-5 pt-lg-4 pt-lg-3 p-4 w-100 ">
-                    <img src="../asset/img/Please.png" class="img-fluid" class="dell" width="250px">
+            <!-- Alert Messages -->
+            <?php
+            if (!empty($mensaje)) {
+                foreach ($mensaje as $msg) {
+                    echo '<div class="alert-message">';
+                    echo '<i class="bi bi-exclamation-circle"></i>';
+                    echo '<span>' . htmlspecialchars($msg) . '</span>';
+                    echo '</div>';
+                }
+            }
+            if (!empty($mensaje2)) {
+                foreach ($mensaje2 as $msg) {
+                    echo '<div class="alert-message success">';
+                    echo '<i class="bi bi-check-circle"></i>';
+                    echo '<span>' . htmlspecialchars($msg) . '</span>';
+                    echo '</div>';
+                }
+            }
+            ?>
+
+            <!-- Form -->
+            <form action="" method="post" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label-nbs" for="nombre">
+                            <i class="bi bi-person"></i> Nombre completo
+                        </label>
+                        <input type="text" id="nombre" name="nombre" class="form-control-nbs" 
+                               placeholder="Juan Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-nbs" for="usuario">
+                            <i class="bi bi-at"></i> Usuario
+                        </label>
+                        <input type="text" id="usuario" name="usuario" class="form-control-nbs" 
+                               placeholder="juan_perez" required>
+                    </div>
                 </div>
-                <div class="px-lg-5 py-lg-4 p-4 w-100 align-self-center">
 
-                    <form action="" method="post" class="login-form" enctype="multipart/form-data">
-                        <h1 class="font-weight-bold mb-4">Formulario de registro</h1>
-
-                        <!-- Imprimir mensajes de error si existen -->
-                        <?php
-    if (!empty($mensaje)) {
-        echo '<div class="alert alert-primary" role="alert">';
-        foreach ($mensaje as $msg) {
-            echo '<p><i class="fa-solid fa-triangle-exclamation"></i> ' . $msg . '</p>';
-        }
-        echo '</div>';
-    }
-    if (!empty($mensaje2)) {
-        echo '<div class="alert alert-success" role="alert">';
-        foreach ($mensaje2 as $msg) {
-            echo '<p><i class="fa-solid fa-circle-check"></i> ' . $msg . '</p>';
-        }
-        echo '</div>';
-    }
-    ?>
-
-                        <!-- Campos del formulario -->
-                        <div class="form-floating mb-4">
-                            <input type="text" name="nombre" class="form-control font-weight-bold" id="floatingInput"
-                                required>
-                            <label for="floatingInput">Nombre completo</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="text" name="usuario" class="form-control font-weight-bold" id="floatingInput"
-                                required>
-                            <label for="floatingInput">Usuario</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="email" name="correo" class="form-control font-weight-bold" id="floatingInput"
-                                required>
-                            <label for="floatingInput">Correo</label>
-                        </div>
-                        <div class="form mb-4">
-                            <label class="form-label">Foto de perfil</label>
-                            <input type="file" class="form-control" name="imagen">
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" name="contraseña" class="form-control font-weight-bold mb-2"
-                                id="floatingPassword" required>
-                            <label for="floatingPassword">Contraseña</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" name="confirma_contraseña" class="form-control font-weight-bold mb-2"
-                                id="floatingPassword" required>
-                            <label for="floatingPassword">Confirmar contraseña</label>
-                        </div>
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" name="connected" class="form-check-input" id="connected" required>
-                            <label for="connected" class="form-check-label">Acepto términos y condiciones</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary botin w-100">Registrarme</button>
-                    </form>
-
-
+                <div class="form-group">
+                    <label class="form-label-nbs" for="correo">
+                        <i class="bi bi-envelope"></i> Correo electrónico
+                    </label>
+                    <input type="email" id="correo" name="correo" class="form-control-nbs" 
+                           placeholder="correo@ejemplo.com" required>
                 </div>
-                <div class="text-center px-lg-5 pt-lg-3 pt-lg-4 p-4 w-100 ">
 
-                    <span>Ya tengo Cuenta? <a href="login.php">Iniciar sesión</a></span> <br>
-
+                <div class="form-group">
+                    <label class="form-label-nbs" for="imagen">
+                        <i class="bi bi-image"></i> Foto de perfil
+                    </label>
+                    <input type="file" id="imagen" name="imagen" class="form-control-nbs" accept="image/*">
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label-nbs" for="contraseña">
+                            <i class="bi bi-lock"></i> Contraseña
+                        </label>
+                        <input type="password" id="contraseña" name="contraseña" class="form-control-nbs" 
+                               placeholder="••••••••" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-nbs" for="confirma_contraseña">
+                            <i class="bi bi-lock-fill"></i> Confirmar
+                        </label>
+                        <input type="password" id="confirma_contraseña" name="confirma_contraseña" class="form-control-nbs" 
+                               placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px; display: flex; gap: 8px; align-items: flex-start;">
+                    <input type="checkbox" id="connected" name="connected" class="form-check-input" 
+                           style="margin-top: 4px;" required>
+                    <label for="connected" style="font-size: 13px; color: var(--text-secondary); margin: 0; cursor: pointer;">
+                        Acepto los <a href="#" style="color: var(--accent); text-decoration: none;">términos y condiciones</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    <i class="bi bi-person-plus"></i> Crear cuenta
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="register-footer">
+                ¿Ya tienes cuenta? 
+                <a href="login.php">Inicia sesión</a>
             </div>
-
-
-    </section>
-    <div class="floating_menu" id="FloatMenu">
-        <div class="menu" onclick="toggleMenu()">
-            <i class="fas fa-plus"></i>
-        </div>
-
-        <div class="sud_menu">
-            <a href="../index.php"><i class="fas fa-home" style="--i:1"></i></a>
-            <a href="login.php"><i class="fas fa-caret-right" style="--i:2"></i></a>
-            <a href="registro.php"><i class="fas fa-address-card" style="--i:3"></i></a>
         </div>
     </div>
-
-    <script>
-    var menu = document.querySelector("#FloatMenu");
-    menu.onclick = function() {
-        menu.classList.toggle("active");
-
-    }
-    </script>
-
-    <!---->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
-    </script>
 </body>
 
 </html>

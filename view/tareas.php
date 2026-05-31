@@ -1,196 +1,162 @@
 <?php
 include_once 'encabezado.php';
-include "../controller/cnt_materia.php";
 include "../controller/filtros.php";
 
-// Funcion de color para los estados
-function getBadgeClass($estado) {
-    switch ($estado) {
-        case 'pendiente':
-            return 'warning';
-        case 'en_progreso':
-            return 'info';
-        case 'completada':
-            return 'success';
-        case 'cancelada':
-            return 'danger';
-        default:
-            return 'secondary';
-    }
+function statusClass($s) {
+    return match($s) { 'pendiente'=>'status-pending','en_progreso'=>'status-progress','completada'=>'status-done','cancelada'=>'status-cancelled',default=>'' };
 }
-
-
+function statusLabel($s) {
+    return match($s) { 'pendiente'=>'Pendiente','en_progreso'=>'En progreso','completada'=>'Completada','cancelada'=>'Cancelada',default=>$s };
+}
+function tipoLabel($t) {
+    return match($t) { 'quiz'=>'Quiz','parcial'=>'Parcial','examen_final'=>'Examen','proyecto'=>'Proyecto','otro'=>'Otro',default=>'Tarea' };
+}
+function getUrgencia($fecha, $hora, $estado) {
+    if (in_array($estado, ['completada','cancelada'])) return null;
+    $now = new DateTime();
+    $dl  = new DateTime($fecha.' '.($hora??'23:59:00'));
+    $h   = $now->diff($dl)->days * 24 + $now->diff($dl)->h;
+    if ($dl < $now)  return 'urgent';
+    if ($h <= 24)    return 'urgent';
+    if ($h <= 72)    return 'soon';
+    return null;
+}
 ?>
-
-<!--  barra de busqueda -->
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="dropdown">
-
-                    <button class="btn bnt-dsing dropdown-toggle" type="button" id="filterDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Todas
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                        <li><a class="dropdown-item" href="?filter=todos">Todas</a></li>
-                        <li><a class="dropdown-item" href="?filter=pendiente">Pendiente</a></li>
-                        <li><a class="dropdown-item" href="?filter=en_progreso">En progreso</a></li>
-                        <li><a class="dropdown-item" href="?filter=completada">Completada</a></li>
-                        <li><a class="dropdown-item" href="?filter=cancelada">Cancelada</a></li>
-                    </ul>
-                </div>
-
-                <form class="flex-grow-1 mx-4" action="" method="get">
-                    <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
-                    <input type="hidden" name="id_materia"
-                        value="<?php echo htmlspecialchars($id_materia_seleccionada); ?>">
-                    <input type="text" name="busqueda" class="form-control" placeholder="Buscar"
-                        value="<?php echo $busqueda_mostrada; ?>">
-
-                </form>
-
-
-
-                <div class="dropdown mx-2">
-
-                    <button class="btn bnt-dsing dropdown-toggle" type="button" id="sortDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-filter-circle-fill"> Ordenar por Materia</i>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-                        <?php foreach ($materias as $materia): ?>
-                        <li>
-                            <a class="dropdown-item"
-                                href="?id_materia=<?php echo $materia['id_materia']; ?>"><?php echo htmlspecialchars($materia['nombre_materia']); ?></a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-
-                </div>
-                <div class="dropdown">
-                    <button class="btn bnt-dsing dropdown-toggle" type="button" id="viewDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Fecha
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="viewDropdown">
-                        
-                    <li><a class="dropdown-item" href="#">Fecha de finalización</a></li>
-                    </ul>
-                </div>
+<div class="page-content">
+    <div class="page-header">
+        <div class="page-header-row">
+            <div>
+                <div class="page-header-eyebrow">Semestre activo</div>
+                <h1 class="page-header-title">Mis actividades</h1>
+                <p class="page-header-sub">Todas las actividades de tus materias.</p>
             </div>
         </div>
     </div>
-</div>
-<!-- barra de busqueda -->
 
+    <!-- Filter bar -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px;">
+        <!-- Status filter -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <?php foreach(['todos'=>'Todas','pendiente'=>'Pendiente','en_progreso'=>'En progreso','completada'=>'Completada','cancelada'=>'Cancelada'] as $k=>$lbl): ?>
+            <a href="?filter=<?= $k ?>&id_materia=<?= htmlspecialchars($id_materia_seleccionada) ?>&busqueda=<?= urlencode($busqueda_mostrada) ?>"
+               style="font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-family:var(--font-mono);text-decoration:none;
+                      background:<?= $filter===$k?'var(--accent-dim)':'transparent' ?>;
+                      color:<?= $filter===$k?'var(--accent)':'var(--text-secondary)' ?>;
+                      border-color:<?= $filter===$k?'var(--accent)':'var(--border)' ?>;transition:.15s;">
+                <?= $lbl ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
 
-<!-- -->
-<!-- VISTA CARD -->
-<div class="container mt-4">
-    <div class="row mt-4">
-        <?php if (!empty($tareas)): ?>
-        <?php foreach ($tareas as $tarea): ?>
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-            <!-- Card Container -->
-            <div class="card h-100 shadow-sm border-0 rounded-lg">
-                <div class="card-header text-white d-flex justify-content-between align-items-center"
-                    style="background: <?php echo isset($tarea['color']) ? 'linear-gradient(45deg, ' . htmlspecialchars($tarea['color']) . ', #333)' : '#333'; ?>;">
-                    <!-- Mostrar el nombre de la materia -->
-                    <h6 class="mb-0">
-                        <?php echo htmlspecialchars($tarea['nombre_tarea']); ?>
-                    </h6>
+        <!-- Subject filter dropdown -->
+        <div class="relative" style="margin-left:auto;">
+            <button class="btn-ghost" onclick="document.getElementById('mtrDrop').classList.toggle('open')">
+                <i class="bi bi-journal-bookmark"></i>
+                <?= $id_materia_seleccionada ? htmlspecialchars(array_column($materias,'nombre_materia','id_materia')[$id_materia_seleccionada]??'Materia') : 'Todas las materias' ?>
+                <i class="bi bi-chevron-down" style="font-size:10px;"></i>
+            </button>
+            <div class="ctx-menu" id="mtrDrop" style="min-width:200px;right:0;top:calc(100% + 4px);">
+                <a class="ctx-item" href="?filter=<?= urlencode($filter) ?>&busqueda=<?= urlencode($busqueda_mostrada) ?>">Todas las materias</a>
+                <div class="ctx-sep"></div>
+                <?php foreach ($materias as $m): ?>
+                <a class="ctx-item" href="?filter=<?= urlencode($filter) ?>&id_materia=<?= $m['id_materia'] ?>&busqueda=<?= urlencode($busqueda_mostrada) ?>">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:<?= htmlspecialchars($m['color']??'#4af0c8') ?>;margin-right:4px;"></span>
+                    <?= htmlspecialchars($m['nombre_materia']) ?>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
 
-                    <!-- Dropdown button in the task card -->
-                    <div class="dropdown ms-auto">
-                        <button class="btn btn-sm dropdown-toggle accion-btn text-white" type="button"
-                            id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-gear-fill"></i>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li>
-                                <button class="dropdown-item"
-                                    onclick="cambiarEstado(<?php echo $tarea['id_tarea']; ?>, 'pendiente')">Pendiente</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item"
-                                    onclick="cambiarEstado(<?php echo $tarea['id_tarea']; ?>, 'en_progreso')">En
-                                    Progreso</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item"
-                                    onclick="cambiarEstado(<?php echo $tarea['id_tarea']; ?>, 'completada')">Completada</button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item"
-                                    onclick="cambiarEstado(<?php echo $tarea['id_tarea']; ?>, 'cancelada')">Cancelada</button>
-                            </li>
-                        </ul>
+        <!-- Search -->
+        <form action="" method="get" style="display:flex;align-items:center;">
+            <input type="hidden" name="filter" value="<?= htmlspecialchars($filter) ?>">
+            <input type="hidden" name="id_materia" value="<?= htmlspecialchars($id_materia_seleccionada) ?>">
+            <div style="display:flex;align-items:center;gap:8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-md);padding:6px 12px;">
+                <i class="bi bi-search" style="color:var(--text-tertiary);font-size:12px;"></i>
+                <input type="text" name="busqueda" class="form-control-nbs" style="background:transparent;border:none;padding:0;width:160px;font-size:13px;"
+                       placeholder="Buscar…" value="<?= htmlspecialchars($busqueda_mostrada) ?>">
+            </div>
+        </form>
+    </div>
+
+    <!-- Tasks -->
+    <?php if (!empty($tareas_filtradas)): ?>
+    <div class="tasks-grid">
+        <?php foreach ($tareas_filtradas as $t):
+            $urg    = getUrgencia($t['fecha_cierre'], $t['hora_cierre']??'23:59:00', $t['estado']);
+            $isDone = in_array($t['estado'], ['completada','cancelada']);
+            $clr    = $t['color'] ?? '#4af0c8';
+        ?>
+        <div class="task-card <?= $isDone?'is-done':'' ?>">
+            <div class="task-card-header">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <span class="task-type-chip" style="background:<?= $clr ?>22;color:<?= $clr ?>;"><?= tipoLabel($t['tipo_tarea']??'tarea') ?></span>
+                        <span style="font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);">
+                            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:<?= $clr ?>;margin-right:3px;"></span>
+                            <?= htmlspecialchars($t['nombre_materia']) ?>
+                        </span>
+                    </div>
+                    <div class="task-title"><?= htmlspecialchars($t['nombre_tarea']) ?></div>
+                </div>
+                <div class="relative" style="flex-shrink:0;">
+                    <button class="btn-icon" onclick="toggleCtx('tc-<?= $t['id_tarea'] ?>')"><i class="bi bi-three-dots-vertical"></i></button>
+                    <div class="ctx-menu" id="tc-<?= $t['id_tarea'] ?>">
+                        <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'pendiente')">⏳ Pendiente</div>
+                        <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'en_progreso')">🔄 En progreso</div>
+                        <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'completada')">✅ Completada</div>
+                        <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'cancelada')">🚫 Cancelada</div>
+                        <div class="ctx-sep"></div>
+                        <a class="ctx-item" href="detalle_materia.php?id_materia=<?= $t['id_materia'] ?>"><i class="bi bi-arrow-right-circle"></i> Ver materia</a>
                     </div>
                 </div>
-                <div class="card-body">
-                    <!-- Mostrar el nombre de la tarea -->
-                    <p class="mb-0">
-
-                        <?php echo htmlspecialchars($tarea['nombre_materia']); ?>
-                    </p>
-                    <!-- Descripción de la tarea -->
-                    <p class="card-text">
-                        <?php echo htmlspecialchars($tarea['descripcion_tarea']); ?>
-                    </p>
+            </div>
+            <div class="task-card-body">
+                <?php if ($urg): ?>
+                <div class="deadline-banner <?= $urg ?>">
+                    <?= $urg==='urgent' ? '🔴 Urgente' : '🟡 Próximamente' ?>
                 </div>
-                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="card-text mb-1"><small class="text-muted"><i class="bi bi-calendar-fill"></i> Creado
-                                en:
-                                <?php echo htmlspecialchars($tarea['fecha_creacion']); ?></small></p>
-                        <p class="card-text mb-1"><small class="text-muted"><i class="bi bi-calendar-fill"></i> Fecha de
-                                Cierre:
-                                <?php echo htmlspecialchars($tarea['fecha_cierre']); ?></small></p>
-                    </div>
-                    <span class="badge bg-<?php echo getBadgeClass($tarea['estado']); ?>">
-                        <?php echo htmlspecialchars($tarea['estado']); ?>
+                <?php endif; ?>
+                <p class="task-desc"><?= htmlspecialchars($t['descripcion_tarea']) ?></p>
+            </div>
+            <div class="task-card-footer">
+                <div class="task-deadline <?= $urg??'' ?>">
+                    <i class="bi bi-calendar3"></i>
+                    <?= date('d/m/Y', strtotime($t['fecha_cierre'])) ?>
+                    <span style="background:var(--bg-overlay);padding:1px 5px;border-radius:3px;font-size:10px;">
+                        <?= substr($t['hora_cierre']??'23:59:00',0,5) ?>
                     </span>
                 </div>
+                <span class="status-badge <?= statusClass($t['estado']) ?>"><?= statusLabel($t['estado']) ?></span>
             </div>
         </div>
         <?php endforeach; ?>
-        <?php else: ?>
-        <div class="col-12 no-tareas">
-            <p>No hay tareas para mostrar.</p>
-        </div>
-        <?php endif; ?>
     </div>
+    <?php else: ?>
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-search"></i></div>
+        <div class="empty-title">Sin resultados</div>
+        <div class="empty-sub">Ajusta los filtros o la búsqueda.</div>
+        <a href="tareas.php" class="btn-ghost" style="text-decoration:none;">Limpiar filtros</a>
+    </div>
+    <?php endif; ?>
 </div>
 
-
 <script>
-function cambiarEstado(tareaId, nuevoEstado) {
-    // Realizar la solicitud AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "../controller/cmb_estado.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                location.reload(); // Recargar la página para reflejar los cambios
-            } else {
-                alert("Error: " + response.message);
-            }
-        }
-    };
-
-    xhr.send("id_tarea=" + encodeURIComponent(tareaId) + "&nuevo_estado=" + encodeURIComponent(nuevoEstado));
+function toggleCtx(id) {
+    const m = document.getElementById(id);
+    document.querySelectorAll('.ctx-menu.open').forEach(x => { if(x.id!==id) x.classList.remove('open'); });
+    m.classList.toggle('open');
+}
+function cambiarEstado(id, estado) {
+    fetch('../controller/cmb_estado.php', {
+        method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:`id_tarea=${id}&nuevo_estado=${encodeURIComponent(estado)}`
+    }).then(r=>r.json()).then(d=>{
+        if(d.success){showToast('Estado actualizado.','success');setTimeout(()=>location.reload(),600);}
+        else Swal.fire('Error',d.message,'error');
+    });
 }
 </script>
 
-
-
-
-
-<?php
-include_once 'footer.php';
-?>
+<?php include_once 'footer.php'; ?>

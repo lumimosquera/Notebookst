@@ -1,217 +1,261 @@
 
 <?php
-
-include "../controller/cnt_login.php"
-
-
+include "../controller/cnt_login.php";
 ?>
 
-
-
-
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Mega</title>
+    <title>Iniciar sesión • Notebookst</title>
     <link rel="icon" href="../asset/img/N.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/stilo.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://kit.fontawesome.com/b02da9335c.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="../asset/css/notebookst.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body {
-            background: white;
-
-        }
-
-
-
-        .floating_menu {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
-        }
-
-        .menu i {
-            color: #fff;
-        }
-
-        .menu {
-            background-color: #007bff;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-base) 0%, #e3f0f5 50%, var(--bg-overlay) 100%);
+            position: relative;
+            overflow: hidden;
         }
 
-        .menu:hover {
-            background-color: #0056b3;
-        }
-
-        .sud_menu {
+        /* Fondo decorativo */
+        body::before {
+            content: '';
             position: absolute;
-            right: 60px;
-            bottom: 0;
-            transform: translateX(100%);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            opacity: 0;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(17,164,255,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(74,240,200,0.04) 0%, transparent 50%);
             pointer-events: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .floating_menu.active .sud_menu {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
         }
 
-        .sud_menu i {
+        .login-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            padding: 32px;
+            box-shadow: 0 24px 80px rgba(0,0,0,.6);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: var(--r-sm);
+            display: grid;
+            place-items: center;
+            margin: 0 auto 16px;
             font-size: 24px;
-            color: #fff;
-            background-color: #007bff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            color: var(--text-inverse);
+            font-weight: 700;
         }
 
-        .sud_menu i:hover {
-            background-color: #0056b3;
+        .login-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 24px;
+        }
+
+        .alert-message {
+            background: rgba(252,92,125,0.1);
+            border: 1px solid rgba(252,92,125,0.3);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--status-cancelled);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-message i {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--accent);
+            color: var(--text-inverse);
+            border: none;
+            border-radius: var(--r-md);
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login:hover {
+            background: #2de8b8;
+            transform: translateY(-1px);
+            box-shadow: var(--accent-glow);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .login-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color var(--t-fast);
+        }
+
+        .login-footer a:hover {
+            color: #2de8b8;
+        }
+
+        .form-control-nbs {
+            display: block;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        @media (max-width: 480px) {
+            .login-panel {
+                padding: 24px;
+            }
+            .login-title {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 
-
-<body class="">
-
-    <section class="w-60">
-        <div class="row g-0 ">
-            <div class="col-lg-7  bg-primary  w-50 d-none d-lg-block overflow-auto"> <!--CARRUCEL-->
-                <div id="carouselExampleIndicators" class="carousel slide w-100 px-lg-5 pt-lg-4 p-4  " data-bs-ride="true">
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                    </div>
-                    <div class="carousel-inner cartop m-lg-5 w-100 p-lg-5 pt-lg-3  ">
-                        <div class="carousel-item active">
-                            <img src="../asset/img/LN.jpeg" class=" w-75 carru" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../asset/img/ln2.jpeg" class=" w-75 carru" alt="...">
-                        </div>
-                        <div class="carousel-item">
-                            <img src="../asset/img/s3.png" class="w-75 carru" alt="...">
-                        </div>
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden p">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
-                </div>
-
+<body>
+    <div class="login-container">
+        <div class="login-panel">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-logo"> <img src="../asset/img/N.png" alt=""><i class="bi bi-notebook"></i></div>
+                <h1 class="login-title">Bienvenido</h1>
+                <p class="login-subtitle">Accede a tu cuenta Notebookst</p>
             </div>
 
-            <div class="col-lg-5  flex-column align-items-end min-vh-100 bg-white"> <!--align-items-end min-vh-100-->
-                <!--LOGO-->
-                <div class="px-lg-5 pt-lg-4 pt-lg-3 p-4 w-100 ">
-                    <img src="../asset/img/Please.png" class="img-fluid" class="dell" width="300px">
-                </div>
-                <div class="px-lg-5 py-lg-4 p-4 w-100 align-self-center">
-                    <h1 class=" font-weight-bold mb-4">Bienvenido!</h1><!--align-items-end min-vh-100-->
-                    
-
-
-                    <?php if(!empty($message)): ?>
-      <div class="alert alert-primary" role="alert"><p><i class="fa-solid fa-triangle-exclamation"></i> <?= $message ?></p></div>
-    <?php endif; ?>
-                    
-
-                    <form action="" method="post" class="login-form">
-                        <div class="form-floating mb-4">
-                            <!--FORMULARIO-->
-                            <input type="text" name="usuario" class="form-control font-weight-bold" id="floatingInput" required>
-                            <label for="floatingInput">Usuario o correo</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" name="contraseña" class="form-control font-weight-bold mb-2" id="floatingPassword" placeholder="Password" required>
-                            <label for="floatingPassword ">Contraseña</label>
-                            <a href="https://worldvectorlogo.com/downloaded/dell-1" id="emailHelp" class="form-text  text-decoration-none " style="color:#216fdb">¿Olvidaste tu contraseña?
-                            </a>
-                        </div>
-
-
-                        <input type="submit" value="Iniciar sesión" class="btn btn-primary botin w-100" name="btniniciar">Iniciar sesión</input>
-                    </form>
-                    <p class="font-weight-bold text-center">O inicia sesión con Google</p>
-
-
-                    <button class="btn btn-outline-danger w-100 my-1 ">
-                        <div class="row align-items-center">
-                            <div class="clo-2">
-                                <img src="../asset/img/google.png" width="32"> <a href="home.php" class="text-decoration-none">oogle</a>
-                            </div>
-
-                        </div>
-                    </button>
-                </div>
-                <div class="text-center px-lg-5 pt-lg-3 pt-lg-4 p-4 w-100 ">
-
-                    <span class="">No tienes Cuenta? <a href="registro.php" class="btn btn-outline-dark m">Regístrate</a></span> <br>
-
-                </div>
+            <!-- Alert Message -->
+            <?php if(!empty($message)): ?>
+            <div class="alert-message">
+                <i class="bi bi-exclamation-circle"></i>
+                <span><?= htmlspecialchars($message) ?></span>
             </div>
+            <?php endif; ?>
 
+            <!-- Form -->
+            <form action="" method="post">
+                <div class="form-group">
+                    <label class="form-label-nbs" for="usuario">
+                        <i class="bi bi-person"></i> Usuario o correo
+                    </label>
+                    <input type="text" id="usuario" name="usuario" class="form-control-nbs" 
+                           placeholder="ejemplo@correo.com" required autocomplete="username">
+                </div>
 
-    </section>
+                <div class="form-group">
+                    <label class="form-label-nbs" for="contraseña">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <input type="password" id="contraseña" name="contraseña" class="form-control-nbs" 
+                           placeholder="••••••••" required autocomplete="current-password">
+                </div>
 
-    <!--BOTON FLOTANTE-->
+                <button type="submit" name="btniniciar" class="btn-login">
+                    <i class="bi bi-arrow-right"></i> Iniciar sesión
+                </button>
+            </form>
 
-    <div class="floating_menu" id="FloatMenu">
-        <div class="menu" onclick="toggleMenu()">
-            <i class="fas fa-plus"></i>
-        </div>
-
-        <div class="sud_menu">
-            <a href="../index.php"><i class="fas fa-home" style="--i:1"></i></a>
-            <a href="login.php"><i class="fas fa-caret-right" style="--i:2"></i></a>
-            <a href="registro.php"><i class="fas fa-address-card" style="--i:3"></i></a>
+            <!-- Footer -->
+            <div class="login-footer">
+                ¿No tienes cuenta? 
+                <a href="registro.php">Regístrate aquí</a>
+            </div>
         </div>
     </div>
-
-
-    <!-- menu flotante -->
-    <script>
-        var menu = document.querySelector("#FloatMenu");
-        menu.onclick = function() {
-            menu.classList.toggle("active");
-
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 
 </html>
