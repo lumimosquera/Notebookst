@@ -1,0 +1,393 @@
+/* ENCABEZADO*/
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--azul-90x) /* Fondo oscuro para el navbar */
+}
+
+
+:root {
+  --color-primario: #05adf0;
+  --azul-ocuro: #05324c;
+  --azul-90x: #006fa7;
+  --azul-claro: #eff9ff;
+  --foter: #0a141d;
+  --blanco: #fff;
+  --claro-50: #e4eaf0;
+  --negro:rgba(236, 250, 250, 0.815);
+  --azul0-1:#f5f8fd;
+  --fnd-carouse-:#1e23291f;
+}
+
+.container .bnt-dsing {
+background-color: var(--azul-90x);
+color: var(--azul-claro);
+border: none; /* Opcional: eliminar el borde predeterminado del botón */
+border-radius: 5px; /* Bordes redondeados */
+padding: 10px 20px; /* Padding para mayor tamaño */
+font-size: 1rem; /* Tamaño de fuente */
+display: flex; /* Flexbox para alinear el ícono y el texto */
+align-items: center; /* Alinear verticalmente el ícono y el texto */
+transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave */
+
+}
+
+.container .btn-dsing:hover  {
+  background-color: var(--color-primario); /* Color de fondo al pasar el ratón */
+  color:var(--blanco);
+}
+
+.container .btn-dsing i {
+  margin-right: 5px; /* Espacio entre el ícono y el texto */
+}
+
+
+/* Contenido principal */
+.img-menu {
+  width: 32px; /* Ajusta el ancho según tus necesidades */
+  height: 32px;
+  border: 2px solid #ffffff; /* Borde blanco alrededor de la imagen */
+  padding: 2px; /* Espacio entre la imagen y el borde */
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Estilos del footer */
+/* Estilos para el navbar */
+.navbar {
+  background-color: var(--azul-ocuro) /* Fondo oscuro para el navbar */
+}
+
+.navbar .navbar-brand, 
+.navbar .nav-link {
+  color: #ffffff; /* Texto blanco para los enlaces del navbar */
+  font-size: 1.1rem; /* Tamaño de fuente ligeramente mayor */
+}
+
+.navbar .navbar-brand i,
+.navbar .nav-link i {
+  margin-right: 5px; /* Margen derecho para los íconos */
+}
+
+/* Botón de colapso personalizado */
+.navbar .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.5); /* Borde blanco semitransparente */
+}
+
+.navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' fill='white' class='bi bi-list' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M2.5 12.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z'/%3E%3C/svg%3E"); /* Ícono personalizado blanco */
+}
+
+/* Estilos para el dropdown */
+.dropdown-toggle::after {
+  color: #ffffff; /* Flecha blanca para el dropdown */
+}
+
+.dropdown-menu {
+  background-color: #343a40; /* Fondo oscuro para el dropdown */
+  border-color: #444c56; /* Borde del dropdown */
+}
+
+.dropdown-item {
+  color: #ffffff; /* Texto blanco para los elementos del dropdown */
+}
+
+.dropdown-item:hover {
+  background-color: #495057; /* Fondo al pasar el ratón */
+}
+
+.dropdown-header {
+  color: #ffffff; /* Texto blanco en el encabezado del dropdown */
+}
+
+/* Estilos para las imágenes */
+
+
+.custom-image {
+  width: 200px; /* Ajusta el ancho según tus necesidades */
+  height: 200px; /* Ajusta la altura según tus necesidades */
+  object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+  border: 2px solid #ffffff; /* Borde blanco alrededor de la imagen */
+  padding: 2px; /* Espacio entre la imagen y el borde */
+}
+
+/* Estilo para el mini-banner del dropdown */
+.mini-banner {
+  text-align: center; /* Centra el contenido del mini-banner */
+}
+
+/* Divider customization */
+.dropdown-divider {
+  border-top: 1px solid #495057; /* Divider con color oscuro */
+}
+
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-width='2' linecap='round' linejoin='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  /* Cambia el color del icono del botón */
+}
+
+.mini-banner {
+  background: linear-gradient(
+    to right,
+    #064b66,
+    #00008b
+  ); /* Azul claro a azul oscuro */
+
+  color: white; /* Ajusta el color del texto si es necesario */
+  text-align: center; /* Centra el texto dentro del banner */
+  border-radius: 5px; /* Añade bordes redondeados si lo deseas */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Añade una sombra para dar profundidad */
+  
+}
+.mini-banner h6 {
+  color: white;
+}
+
+
+
+/* Media queries para dispositivos pequeños */
+@media (max-width: 576px) {
+  .custom-dropdown-menu {
+    width: 300px; /* Ajusta el ancho para dispositivos pequeños */
+    height: auto; /* Deja que la altura sea automática */
+  }
+
+  .img-menu {
+  width: 32px; /* Ajusta el ancho según tus necesidades */
+  height: 32px;
+}
+  .custom-image {
+    width: 50px; /* Ajusta el ancho para dispositivos pequeños */
+    height: 50px; /* Ajusta la altura para dispositivos pequeños */
+  }
+
+  .navbar-brand {
+    font-size: 1rem; /* Ajusta el tamaño de la fuente para dispositivos pequeños */
+  }
+
+  .nav-link {
+    font-size: 0.875rem; /* Ajusta el tamaño de la fuente para dispositivos pequeños */
+  }
+
+  .dropdown-header {
+    text-align: center; /* Centra el contenido en dispositivos pequeños */
+  }
+
+  .dropdown-item {
+    font-size: 0.875rem; /* Ajusta el tamaño de la fuente para dispositivos pequeños */
+  }
+
+  .navbar-toggler {
+    font-size: 0.875rem; /* Ajusta el tamaño del botón para dispositivos pequeños */
+  }
+}
+
+/* FIN DEL ENCABEZADO*/
+
+/* PROFILE*/
+
+.card .card-all {
+background-color: var(--azul-ocuro);
+
+}
+
+
+
+.img-thumbnail {
+  object-fit: cover;
+  border: 3px solid #fff;
+}
+.card-header {
+  
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.card-header h4 {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+
+/* Media queries para dispositivos pequeños */
+@media (max-width: 576px) {
+  .custom-image-profile {
+    width: 100px;
+    height: 100px;
+  }
+
+  .card-deck {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-body {
+    text-align: center;
+  }
+
+  .table {
+    font-size: 0.875rem; /* Ajusta el tamaño de la fuente para dispositivos pequeños */
+  }
+
+  .table th,
+  .table td {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn {
+    width: 100%; /* Hacer que el botón sea de ancho completo */
+    margin-bottom: 10px; /* Añadir un poco de espacio debajo del botón */
+  }
+
+  .modal-dialog {
+    margin: 1rem auto; /* Añadir margen automático para centrar el diálogo modal */
+  }
+}
+
+/* FIN PROFILE*/
+
+
+/* CARD DE VISTA DE LAS MATERIAS*/
+
+.small-box {
+  position: relative;
+  overflow: hidden;
+  height: auto;
+}
+.small-box h5 {
+  font-size: 1.25rem;
+}
+.small-box .btn {
+  border-radius: 5px;
+}
+.small-box .btn .bi {
+  margin-left: 0.5rem;
+}
+.small-box .delete-btn {
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  line-height: 24px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000;
+}
+.small-box .delete-btn i {
+  color: #fff;
+}
+.small-box .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.small-box .stretched-link::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+/* FIN  CARD DE VISTA DE LAS MATERIAS*/
+
+/* CARD DE VISTA DE LAS TAREA*/
+.card-container {
+  margin-bottom: 20px;
+}
+
+.card-container .card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card-container .card:hover {
+  transform: scale(1.03);
+}
+
+.card-container .card-header {
+  background-color: #007bff;
+  color: #fff;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.card-container .card-body {
+  background-color: #f8f9fa;
+  border-radius: 0 0 10px 10px;
+  padding: 20px;
+}
+
+.card-container .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.card-container .card-text {
+  font-size: 0.875rem;
+}
+
+.card-container .btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.card-container .btn:hover {
+  background-color: #0056b3;
+}
+
+.no-tareas {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.125rem;
+  color: #6c757d;
+}
+
+.accion-btn {
+  background-color: transparent;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000;
+  
+}
+
+
+ .accion-btn i {
+  color: #fff;
+}
+
+
+
+/* FOOTER*/
+footer {
+  background-color: var(--foter);
+  color: var(--azul0-1);
+}
+
+
+
+
+
