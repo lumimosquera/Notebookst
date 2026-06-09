@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-08-2024 a las 05:05:59
+-- Tiempo de generación: 09-06-2026 a las 18:08:43
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -31,18 +31,16 @@ CREATE TABLE `materias` (
   `id_materia` int(11) NOT NULL,
   `nombre_materia` varchar(255) NOT NULL,
   `id_usuario` int(11) DEFAULT NULL,
-  `color` varchar(255) DEFAULT NULL
+  `color` varchar(255) DEFAULT NULL,
+  `link` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `materias`
 --
 
-INSERT INTO `materias` (`id_materia`, `nombre_materia`, `id_usuario`, `color`) VALUES
-(23, 'DESARROLLO WEB', 7, 'linear-gradient(45deg, #5789C3, #56E3C5)'),
-(24, 'ESPIRITU EMPRENDEDOR', 7, 'linear-gradient(45deg, #B2D1F7, #19D30A)'),
-(25, 'ESTADISTICA I', 7, 'linear-gradient(45deg, #45283C, #29EB94)'),
-(26, 'SERVIDORES Y SERVICIOS WEB', 7, 'linear-gradient(45deg, #46B640, #1CBD46)');
+INSERT INTO `materias` (`id_materia`, `nombre_materia`, `id_usuario`, `color`, `link`) VALUES
+(33, 'GERENCIA EN PROYECTOS DE INGENIERIA / PRIMER BLOQUE', 9, '#f59e0b', 'https://cdigital.cun.edu.co/course/view.php?id=108717');
 
 -- --------------------------------------------------------
 
@@ -57,19 +55,23 @@ CREATE TABLE `tareas` (
   `descripcion_tarea` text DEFAULT NULL,
   `fecha_creacion` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_cierre` date DEFAULT NULL,
+  `hora_cierre` time NOT NULL DEFAULT '23:59:00',
+  `tipo_tarea` enum('tarea','quiz','parcial','examen_final','proyecto','otro') NOT NULL DEFAULT 'tarea',
   `color` varchar(7) DEFAULT NULL,
-  `estado` enum('pendiente','en_progreso','completada','cancelada') DEFAULT 'pendiente'
+  `estado` enum('pendiente','en_progreso','completada','cancelada') DEFAULT 'pendiente',
+  `link` varchar(500) DEFAULT NULL,
+  `notificado_24h` tinyint(1) DEFAULT 0,
+  `notificado_1h` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `tareas`
 --
 
-INSERT INTO `tareas` (`id_tarea`, `id_materia`, `nombre_tarea`, `descripcion_tarea`, `fecha_creacion`, `fecha_cierre`, `color`, `estado`) VALUES
-(1, 23, 'PRUEBA DIAGNOSTICA', 'SABERES PREVIOS', '2024-08-16 09:32:37', '2024-08-20', '#de3b81', 'completada'),
-(2, 23, 'Quiz 1', 'Semana 2', '2024-08-16 09:34:21', '2024-08-18', '#fe7171', 'completada'),
-(3, 25, 'Quiz 1', 'saberes previos', '2024-08-16 09:46:44', '2024-08-20', '#0046b8', 'completada'),
-(4, 26, 'Quiz 1', 'saberes previos de los estudiantes', '2024-08-16 09:50:55', '2024-08-18', '#b00707', 'completada');
+INSERT INTO `tareas` (`id_tarea`, `id_materia`, `nombre_tarea`, `descripcion_tarea`, `fecha_creacion`, `fecha_cierre`, `hora_cierre`, `tipo_tarea`, `color`, `estado`, `link`, `notificado_24h`, `notificado_1h`) VALUES
+(22, 33, 'PARCIAL 1', '¡Excelente! En la captura se', '2026-06-02 14:35:44', '2026-06-03', '13:59:00', 'examen_final', '#4af0c8', 'completada', NULL, 0, 0),
+(23, 33, 'PARCIAL 1 aaa', 'URGENTE', '2026-06-02 15:00:27', '2026-06-02', '23:59:00', 'examen_final', '#63b3ed', 'completada', NULL, 1, 0),
+(26, 33, 'PARCIAL 1 aaa', 'PARCIAL 1', '2026-06-03 14:35:17', '2026-06-03', '23:59:00', 'proyecto', '#f87171', 'pendiente', NULL, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -91,7 +93,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `nombre`, `usuario`, `correo`, `contraseña`, `imagen`) VALUES
-(7, 'Luis Miguel Mosquera Cuesta', 'LUISM23', 'lumiluis2018@gmail.com', '$2y$10$3eNvubsaKPdUU6oVjrYXZe/Jf9ni9os.P6CH.170Mq9lUmnrkHKly', '../asset/img/user/Foto perfil.png');
+(7, 'Luis Miguel Mosquera Cuesta', 'LUISM23', 'lumilui3s2018@gmail.com', '1040Lumi', '../asset/img/user/Foto perfil.png'),
+(8, 'LUIS MIGUEL', 'LUIS20', 'lumiluis2018@gmail.com', '$2y$10$HV2u1Wo5MtHQ0xLC3Qz/OOQoZrCz.1inZhqOJA1omI5A6tPokm55a', '../asset/img/user/avatar_8_1780284118.jpg'),
+(9, 'Luis Mosquera', 'luismm', 'luis.mosqueraccucue@cun.edu.co', '$2y$10$k4iX/LSnvEOBby2W2LSRwube2TkG587563ygsYTUgkZ8P1NLeff52', '../asset/img/user/G_NKSxNaIAMVWmI.jpg');
 
 --
 -- Índices para tablas volcadas
@@ -126,19 +130,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `materias`
 --
 ALTER TABLE `materias`
-  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id_materia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `tareas`
 --
 ALTER TABLE `tareas`
-  MODIFY `id_tarea` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_tarea` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Restricciones para tablas volcadas
