@@ -23,194 +23,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Notebookst</title>
-    <!-- Icono de la página -->
+    <title>Notebookst | Ownitech</title>
     <link rel="icon" href="asset/img/N.png">
-    <!-- Enlace a Bootstrap y otros CSS -->
     <link rel="stylesheet" href="css/stilo.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
-        /* Estilos del fondo y otros elementos */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f1f1f1;
-            margin: 0;
+        :root {
+            color-scheme: dark;
+            --bg: #060913;
+            --surface: rgba(8, 20, 40, 0.88);
+            --panel: rgba(10, 19, 35, 0.92);
+            --border: rgba(57, 191, 255, 0.16);
+            --blue: #39b7ff;
+            --purple: #9f66ff;
+            --text: #e7f1ff;
+            --muted: #8da6c7;
+            --accent: #40e0d0;
         }
 
-        header {
-            flex: 1;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top, rgba(57, 191, 255, 0.14), transparent 28%),
+                radial-gradient(circle at 90% 20%, rgba(159, 102, 255, 0.14), transparent 16%),
+                linear-gradient(180deg, #02050b 0%, #050b16 45%, #060913 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 40px, 40px 100%;
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 0;
         }
 
         .navbar {
-            background-color: #05324c;
+            background: rgba(7, 16, 29, 0.96);
+            border-bottom: 1px solid rgba(57, 191, 255, 0.12);
+            z-index: 10;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(231, 241, 255, 0.75) !important;
+            transition: color 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #ffffff !important;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 5.5rem 0 4rem;
+            z-index: 1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: -20% 0 20%;
+            background: radial-gradient(circle at 50% 20%, rgba(57, 191, 255, 0.22), transparent 30%);
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .hero .eyebrow {
+            display: inline-flex;
+            padding: 0.65rem 1rem;
+            border: 1px solid rgba(57, 191, 255, 0.18);
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--blue);
+            background: rgba(57, 191, 255, 0.06);
+            margin-bottom: 1.6rem;
+            font-size: 0.8rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 5vw, 4.8rem);
+            line-height: 0.95;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+        }
+
+        .hero h1 .highlight {
+            color: var(--purple);
+        }
+
+        .hero p.lead {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 680px;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3fb7ff 0%, #7d5fff 100%);
+            border: none;
+            box-shadow: 0 18px 40px rgba(63, 183, 255, 0.24);
+        }
+
+        .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #f8fbff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .hero-visual {
+            position: relative;
+            background: rgba(7, 13, 27, 0.88);
+            border: 1px solid rgba(57, 191, 255, 0.18);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(10px);
+        }
+
+        .visual-frame {
+            border: 1px solid rgba(57, 191, 255, 0.2);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(3, 8, 18, 0.9);
+        }
+
+        .visual-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .visual-header span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .terminal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: rgba(158, 214, 255, 0.9);
+        }
+
+        .terminal-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+
+        .terminal-list li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--blue);
+        }
+
+        .feature-card {
+            background: rgba(8, 16, 33, 0.86);
+            border: 1px solid rgba(63, 183, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.24);
+        }
+
+        .feature-card h3 {
+            color: #ffffff;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+        }
+
+        .feature-icon {
+            display: inline-flex;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(57, 191, 255, 0.14);
+            color: var(--blue);
+            margin-bottom: 1rem;
         }
 
         .floating_menu {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 999;
+            bottom: 24px;
+            right: 24px;
+            z-index: 11;
         }
 
         .menu {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #3fb7ff, #7d5fff);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .menu:hover {
-            background-color: #0056b3;
-        }
-
-        .sud_menu {
-            position: absolute;
-            right: 60px;
-            bottom: 0;
-            transform: translateX(100%);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .floating_menu.active .sud_menu {
-            transform: translateX(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .sud_menu i {
-            font-size: 24px;
-            color: #fff;
-            background-color: #007bff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .sud_menu i:hover {
-            background-color: #0056b3;
+            box-shadow: 0 18px 28px rgba(63, 183, 255, 0.26);
         }
 
         .menu i {
             color: #fff;
+            font-size: 1.2rem;
         }
 
-        /* FOOTER */
+        .sud_menu {
+            position: absolute;
+            right: 0;
+            bottom: 72px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(15px);
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .floating_menu.active .sud_menu {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sud_menu a {
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(57, 191, 255, 0.14);
+            color: var(--text);
+            transition: background 0.2s ease;
+        }
+
+        .sud_menu a:hover {
+            background: rgba(57, 191, 255, 0.18);
+        }
+
         footer {
-            background-color: #0a141d;
-            color: #eff9ff;
-            padding: 1rem 0;
-            text-align: center;
-            margin-top: auto;
+            background: rgba(4, 10, 20, 0.98);
+            padding: 1.2rem 0;
+            color: rgba(231, 241, 255, 0.74);
         }
 
-        /* Imagen y video responsivos */
-        header img {
-            max-width: 100%;
-            height: auto;
+        footer p {
+            margin: 0;
+            font-size: 0.95rem;
         }
 
-        #video-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            min-width: 100%;
-            min-height: 100%;
-            z-index: -1;
-            object-fit: cover;
+        .feature-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .feature-pill strong {
+            color: #fff;
+        }
+
+        @media (max-width: 991px) {
+            .hero {
+                padding-top: 4.5rem;
+            }
+
+            .hero-visual {
+                margin-top: 2rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Notebookst</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="./view/registro.php">¿Deseas Registrarte?</a>
+                        <a class="nav-link" href="view/registro.php">Registrarse</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="view/login.php">Iniciar Sesión</a>
+                        <a class="nav-link" href="view/login.php">Iniciar sesión</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Contenido principal -->
-    <header class="py-5 text-center">
-        <img src="asset/img/Please.png" alt="Imagen de bienvenida">
-        <p class="lead">Tu lugar para escribir y organizar tus notas</p>
-    </header>
+    <main class="hero">
+        <div class="container position-relative">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <span class="eyebrow">OWNITECH · DARKBALL EXPERIENCE</span>
+                    <h1>Tu estudio digital con potencia <span class="highlight">futurista</span>.</h1>
+                    <p class="lead">Notebookst reúne notas, tareas y proyectos en una interfaz oscura, elegante y lista para tus ideas más avanzadas.</p>
 
-    <!-- Sección Acerca de -->
-    <section class="py-5" id="about">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <h2>¿Deseas Registrarte?</h2>
-                    <p class="lead">Regístrate para empezar a usar Notebook y guardar tus notas de manera segura.</p>
-                    <a href="view/registro.php" class="btn btn-primary">Registrarse</a>
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="view/registro.php" class="btn btn-primary btn-lg">Comenzar</a>
+                        <a href="view/login.php" class="btn btn-outline-light btn-lg">Iniciar sesión</a>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-5">
+                        <span class="feature-pill"><strong>Seguridad</strong> cifrada</span>
+                        <span class="feature-pill"><strong>Notas</strong> organizadas</span>
+                        <span class="feature-pill"><strong>Interfaz</strong> Darkball</span>
+                    </div>
                 </div>
-                <div class="col-lg-6 mb-4">
-                    <h2>¿Ya tienes una cuenta?</h2>
-                    <p class="lead">Inicia sesión para acceder a tus notas y continuar escribiendo.</p>
-                    <a href="view/login.php" class="btn btn-secondary">Iniciar Sesión</a>
+                <div class="col-lg-5">
+                    <div class="hero-visual">
+                        <div class="visual-frame">
+                            <div class="visual-header">
+                                <span>Notebookst</span>
+                                <span><i class="fas fa-circle" style="color:#39b7ff"></i> Live</span>
+                            </div>
+                            <ul class="terminal-list">
+                                <li>Inicio de sesión seguro activado</li>
+                                <li>Espacio de notas acelerado</li>
+                                <li>Panel de tareas optimizado</li>
+                                <li>Sincronización de ideas en tiempo real</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                        <h3>Ideas claras</h3>
+                        <p>Encuentra la motivación para escribir, anotar y llevar tu productividad a otro nivel.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-tasks"></i></div>
+                        <h3>Control total</h3>
+                        <p>Puedes administrar tareas con prioridad y estado, todo dentro de una vista moderna y simple.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Protegido</h3>
+                        <p>Tu contenido se mantiene confiable y accesible en un entorno pensado para usuarios exigentes.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Video de fondo -->
-    <video autoplay loop muted playsinline id="video-bg">
-        <source src="ruta/de/video.mp4" type="video/mp4">
-        <!-- Si el navegador no admite video, se muestra la imagen de respaldo -->
-        <img src="ruta/de/imagen-de-respaldo.jpg" alt="Video no soportado">
-    </video>
-
-    <!-- Menú flotante -->
     <div class="floating_menu" id="FloatMenu">
         <div class="menu" onclick="toggleMenu()">
             <i class="fas fa-plus"></i>
         </div>
         <div class="sud_menu">
-            <a href="index.php"><i class="fas fa-home"></i></a>
-            <a href="view/login.php"><i class="fas fa-caret-right"></i></a>
-            <a href="view/registro.php"><i class="fas fa-address-card"></i></a>
+            <a href="index.php" title="Inicio"><i class="fas fa-home"></i></a>
+            <a href="view/login.php" title="Login"><i class="fas fa-sign-in-alt"></i></a>
+            <a href="view/registro.php" title="Registro"><i class="fas fa-user-plus"></i></a>
         </div>
     </div>
 
-    <!-- Pie de página -->
-    <footer class="py-3 mt-auto">
+    <footer>
         <div class="container text-center">
-            <p>Notebookst &copy; 2024. Todos los derechos reservados.</p>
+            <p>&copy; <?= date('Y') ?> Notebookst by OwniTech. Todos los derechos reservados.</p>
         </div>
     </footer>
 
-    <!-- Enlaces a JavaScript de Bootstrap y jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function toggleMenu() {
+            document.getElementById('FloatMenu').classList.toggle('active');
+        }
+    </script>
+</body>
+
+</html>
