@@ -86,6 +86,7 @@ function getUrgencia($fecha, $hora, $estado) {
             $urg    = getUrgencia($t['fecha_cierre'], $t['hora_cierre']??'23:59:00', $t['estado']);
             $isDone = in_array($t['estado'], ['completada','cancelada']);
             $clr    = $t['color'] ?? '#4af0c8';
+            
         ?>
         <div class="task-card <?= $isDone?'is-done':'' ?>">
             <div class="task-card-header">
@@ -105,7 +106,12 @@ function getUrgencia($fecha, $hora, $estado) {
                         <i class="bi bi-box-arrow-up-right"></i>
                     </a>
                     <?php endif; ?>
-                    <button class="btn-icon" onclick="toggleCtx('tc-<?= $t['id_tarea'] ?>')"><i class="bi bi-three-dots-vertical"></i></button>
+                    <button class="btn-icon" id="tc-btn-<?= $t['id_tarea'] ?>"
+                        data-nombre="<?= htmlspecialchars($t['nombre_tarea'], ENT_QUOTES) ?>"
+                        onclick="toggleCtx('tc-<?= $t['id_tarea'] ?>')">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    
                     <div class="ctx-menu" id="tc-<?= $t['id_tarea'] ?>">
                         <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'pendiente')">⏳ Pendiente</div>
                         <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'en_progreso')">🔄 En progreso</div>
@@ -113,6 +119,9 @@ function getUrgencia($fecha, $hora, $estado) {
                         <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'cancelada')">🚫 Cancelada</div>
                         <div class="ctx-sep"></div>
                         <a class="ctx-item" href="detalle_materia.php?id_materia=<?= $t['id_materia'] ?>"><i class="bi bi-arrow-right-circle"></i> Ver materia</a>
+                        <div class="ctx-item danger" onclick="eliminarTarea(<?= $t['id_tarea'] ?>, document.getElementById('tc-btn-<?= $t['id_tarea'] ?>').dataset.nombre)">
+                            <i class="bi bi-trash3"></i> Eliminar
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,33 +156,74 @@ function getUrgencia($fecha, $hora, $estado) {
     <?php endif; ?>
 </div>
 
+<!-- Formulario oculto para eliminar tarea -->
+<form id="frmDelTarea" action="../controller/eliminar_tarea.php" method="post" style="display:none">
+    <input type="hidden" name="id_tarea" id="delTareaId">
+    <input type="hidden" name="redirect" value="tareas.php">
+</form>
+
 <script>
+// ── Cierre global de menús al hacer click fuera ──────────────
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative')) {
+        document.querySelectorAll('.ctx-menu.open').forEach(x => x.classList.remove('open'));
+    }
+});
+
 function toggleCtx(id) {
     const m = document.getElementById(id);
-    document.querySelectorAll('.ctx-menu.open').forEach(x => { if(x.id!==id) x.classList.remove('open'); });
-    m.classList.toggle('open');
-    
-    // Ajustar posición si está fuera de pantalla
-    if (m.classList.contains('open')) {
+    const isOpen = m.classList.contains('open');
+
+    document.querySelectorAll('.ctx-menu.open').forEach(x => x.classList.remove('open'));
+
+    if (!isOpen) {
+        m.classList.add('open');
         setTimeout(() => {
             const rect = m.getBoundingClientRect();
-            const isOutOfBounds = rect.right > window.innerWidth - 10;
-            
-            if (isOutOfBounds && !m.classList.contains('align-left')) {
+            if (rect.right > window.innerWidth - 10) {
                 m.classList.add('align-left');
-            } else if (!isOutOfBounds && m.classList.contains('align-left')) {
+            } else {
                 m.classList.remove('align-left');
             }
         }, 0);
     }
 }
+
 function cambiarEstado(id, estado) {
+    document.querySelectorAll('.ctx-menu.open').forEach(x => x.classList.remove('open'));
     fetch('../controller/cmb_estado.php', {
-        method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:`id_tarea=${id}&nuevo_estado=${encodeURIComponent(estado)}`
-    }).then(r=>r.json()).then(d=>{
-        if(d.success){showToast('Estado actualizado.','success');setTimeout(()=>location.reload(),600);}
-        else Swal.fire('Error',d.message,'error');
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `id_tarea=${id}&nuevo_estado=${encodeURIComponent(estado)}`
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            showToast('Estado actualizado.', 'success');
+            setTimeout(() => location.reload(), 600);
+        } else {
+            Swal.fire('Error', d.message || 'No se pudo actualizar.', 'error');
+        }
+    })
+    .catch(() => {
+        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+    });
+}
+
+function eliminarTarea(id, nombre) {
+    document.querySelectorAll('.ctx-menu.open').forEach(x => x.classList.remove('open'));
+    Swal.fire({
+        title: '¿Eliminar actividad?',
+        html: `<span style="color:var(--text-secondary);font-size:14px;">Se eliminará <strong style="color:#eef0f5">${nombre}</strong>.</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+    }).then(r => {
+        if (r.isConfirmed) {
+            document.getElementById('delTareaId').value = id;
+            document.getElementById('frmDelTarea').submit();
+        }
     });
 }
 </script>
