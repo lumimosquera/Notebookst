@@ -15,6 +15,53 @@ if (!$materia) { header('Location: home.php'); exit; }
 
 // ── POST ────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // ── Editar tarea existente ───────────────────────────────
+    if (isset($_POST['accion']) && $_POST['accion'] === 'editar_tarea') {
+        $id_tarea_edit = intval($_POST['id_tarea_edit'] ?? 0);
+        $tipos_validos = ['tarea','quiz','parcial','examen_final','proyecto','otro'];
+
+        // Verificar que la tarea pertenece a esta materia y usuario
+        $chkT = $pdo->prepare("SELECT t.id_tarea FROM tareas t
+            INNER JOIN materias m ON m.id_materia = t.id_materia
+            WHERE t.id_tarea = ? AND t.id_materia = ? AND m.id_usuario = ?");
+        $chkT->execute([$id_tarea_edit, $id_materia, $id_usuario]);
+        if (!$chkT->fetch()) {
+            header("Location: detalle_materia.php?id_materia={$id_materia}&msg=".urlencode("Tarea no encontrada.")."&type=danger");
+            exit;
+        }
+
+        $e_nombre = trim($_POST['e_nombre_tarea']      ?? '');
+        $e_desc   = trim($_POST['e_descripcion_tarea'] ?? '');
+        $e_fecha  = trim($_POST['e_fecha_cierre']      ?? '');
+        $e_hora   = trim($_POST['e_hora_cierre']       ?? '23:59');
+        $e_tipo   = $_POST['e_tipo_tarea'] ?? 'tarea';
+        $e_color  = $_POST['e_color']      ?? '#4af0c8';
+        $e_link   = trim($_POST['e_link_tarea']        ?? '');
+
+        if (!in_array($e_tipo, $tipos_validos, true)) $e_tipo = 'tarea';
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $e_color)) $e_color = '#4af0c8';
+        $e_link_val = ($e_link !== '' && filter_var($e_link, FILTER_VALIDATE_URL)) ? $e_link : null;
+
+        if (!empty($e_nombre) && !empty($e_desc) && !empty($e_fecha)) {
+            try {
+                $pdo->prepare("UPDATE tareas SET
+                    nombre_tarea = ?, descripcion_tarea = ?, tipo_tarea = ?,
+                    fecha_cierre = ?, hora_cierre = ?, color = ?, link = ?
+                    WHERE id_tarea = ?")
+                    ->execute([$e_nombre, $e_desc, $e_tipo, $e_fecha, $e_hora.':00', $e_color, $e_link_val, $id_tarea_edit]);
+                header("Location: detalle_materia.php?id_materia={$id_materia}&msg=".urlencode("Actividad actualizada.")."&type=success");
+                exit;
+            } catch(PDOException $e) {
+                header("Location: detalle_materia.php?id_materia={$id_materia}&msg=".urlencode("Error al actualizar.")."&type=danger");
+                exit;
+            }
+        } else {
+            header("Location: detalle_materia.php?id_materia={$id_materia}&msg=".urlencode("Completa todos los campos.")."&type=warning");
+            exit;
+        }
+    }
+
     $tipos_validos = ['tarea','quiz','parcial','examen_final','proyecto','otro'];
     $nombre      = trim($_POST['nombre_tarea']      ?? '');
     $desc        = trim($_POST['descripcion_tarea'] ?? '');
@@ -173,10 +220,20 @@ include_once 'encabezado.php';
                         <i class="bi bi-box-arrow-up-right"></i>
                     </a>
                     <?php endif; ?>
-                    <button class="btn-icon" onclick="toggleCtx('tc-<?= $t['id_tarea'] ?>')">
+                    <button class="btn-icon" onclick="toggleCtx('tc-<?= $t['id_tarea'] ?>')"
+                        data-id="<?= $t['id_tarea'] ?>"
+                        data-nombre="<?= htmlspecialchars($t['nombre_tarea'], ENT_QUOTES) ?>"
+                        data-desc="<?= htmlspecialchars($t['descripcion_tarea'], ENT_QUOTES) ?>"
+                        data-tipo="<?= htmlspecialchars($t['tipo_tarea'] ?? 'tarea', ENT_QUOTES) ?>"
+                        data-fecha="<?= htmlspecialchars($t['fecha_cierre'], ENT_QUOTES) ?>"
+                        data-hora="<?= htmlspecialchars(substr($t['hora_cierre'] ?? '23:59:00', 0, 5), ENT_QUOTES) ?>"
+                        data-color="<?= htmlspecialchars($t['color'] ?? '#4af0c8', ENT_QUOTES) ?>"
+                        data-link="<?= htmlspecialchars($t['link'] ?? '', ENT_QUOTES) ?>">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <div class="ctx-menu" id="tc-<?= $t['id_tarea'] ?>">
+                        <div class="ctx-item" onclick="abrirEditarTarea(this.closest('.ctx-menu').previousElementSibling)"><i class="bi bi-pencil-square"></i> Editar actividad</div>
+                        <div class="ctx-sep"></div>
                         <div class="ctx-item" style="font-size:11px;color:var(--text-tertiary);padding-bottom:4px;">Cambiar estado</div>
                         <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'pendiente')">⏳ Pendiente</div>
                         <div class="ctx-item" onclick="cambiarEstado(<?= $t['id_tarea'] ?>,'en_progreso')">🔄 En progreso</div>
@@ -296,6 +353,80 @@ include_once 'encabezado.php';
     </div>
 </div>
 
+<!-- MODAL EDITAR ACTIVIDAD -->
+<div class="modal-nbs-backdrop" id="modalEditarTarea" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-nbs">
+        <div class="modal-nbs-header">
+            <span class="modal-nbs-title">Editar actividad</span>
+            <button class="btn-icon" onclick="document.getElementById('modalEditarTarea').classList.remove('open')">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form action="detalle_materia.php?id_materia=<?= $id_materia ?>" method="post">
+            <input type="hidden" name="accion" value="editar_tarea">
+            <input type="hidden" name="id_tarea_edit" id="editIdTarea">
+            <div class="modal-nbs-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label-nbs">Tipo</label>
+                        <select name="e_tipo_tarea" id="editTipo" class="form-control-nbs" required>
+                            <option value="tarea">📄 Tarea</option>
+                            <option value="quiz">📝 Quiz</option>
+                            <option value="parcial">📋 Parcial</option>
+                            <option value="examen_final">🎯 Examen final</option>
+                            <option value="proyecto">🗂 Proyecto</option>
+                            <option value="otro">📌 Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-nbs">Color</label>
+                        <div class="color-swatch-row" id="editSwatchRow">
+                            <?php
+                            $swatches = ['#4af0c8','#63b3ed','#f5a623','#fc5c7d','#a78bfa','#34d399','#f87171','#e879f9','#fbbf24','#38bdf8'];
+                            foreach($swatches as $c): ?>
+                            <div class="color-swatch"
+                                 style="background:<?= $c ?>;" data-color="<?= $c ?>"
+                                 onclick="selectSwatchEdit(this)"></div>
+                            <?php endforeach; ?>
+                        </div>
+                        <input type="hidden" name="e_color" id="editColorInput" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-nbs">Nombre</label>
+                    <input type="text" name="e_nombre_tarea" id="editNombre" class="form-control-nbs"
+                           placeholder="Ej: Quiz Unidad 2" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-nbs">Descripción</label>
+                    <textarea name="e_descripcion_tarea" id="editDesc" class="form-control-nbs" rows="2"
+                              placeholder="Detalles de la actividad…" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label-nbs">Fecha límite</label>
+                        <input type="date" name="e_fecha_cierre" id="editFecha" class="form-control-nbs" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-nbs">Hora límite</label>
+                        <input type="time" name="e_hora_cierre" id="editHora" class="form-control-nbs">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label-nbs">Enlace (opcional)</label>
+                    <input type="url" name="e_link_tarea" id="editLink" class="form-control-nbs"
+                           placeholder="Ej: https://docs.google.com/forms/..."
+                           title="Debe ser una URL válida (https://...)">
+                </div>
+            </div>
+            <div class="modal-nbs-footer">
+                <button type="button" class="btn-ghost" onclick="document.getElementById('modalEditarTarea').classList.remove('open')">Cancelar</button>
+                <button type="submit" class="btn-primary-nbs"><i class="bi bi-save2"></i> Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Hidden delete form -->
 <form id="frmDelTarea" action="../controller/eliminar_tarea.php" method="post" style="display:none">
     <input type="hidden" name="id_tarea"   id="delTareaId">
@@ -350,6 +481,31 @@ function eliminarTarea(id, nombre) {
             document.getElementById('frmDelTarea').submit();
         }
     });
+}
+function selectSwatchEdit(el) {
+    document.querySelectorAll('#editSwatchRow .color-swatch').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('editColorInput').value = el.dataset.color;
+}
+function abrirEditarTarea(btn) {
+    document.querySelectorAll('.ctx-menu.open').forEach(x => x.classList.remove('open'));
+
+    document.getElementById('editIdTarea').value    = btn.dataset.id;
+    document.getElementById('editNombre').value     = btn.dataset.nombre;
+    document.getElementById('editDesc').value       = btn.dataset.desc;
+    document.getElementById('editFecha').value      = btn.dataset.fecha;
+    document.getElementById('editHora').value       = btn.dataset.hora;
+    document.getElementById('editLink').value       = btn.dataset.link;
+    document.getElementById('editColorInput').value = btn.dataset.color;
+
+    const sel = document.getElementById('editTipo');
+    for (let o of sel.options) o.selected = (o.value === btn.dataset.tipo);
+
+    document.querySelectorAll('#editSwatchRow .color-swatch').forEach(s => {
+        s.classList.toggle('selected', s.dataset.color === btn.dataset.color);
+    });
+
+    document.getElementById('modalEditarTarea').classList.add('open');
 }
 </script>
 <?php include_once 'footer.php'; ?>
