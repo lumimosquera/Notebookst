@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hora        = trim($_POST['hora_cierre']       ?? '23:59');
     $tipo        = $_POST['tipo_tarea'] ?? 'tarea';
     $color       = $_POST['color']      ?? '#4af0c8';
+    $link = trim($_POST['link_tarea'] ?? '');
 
     if (!in_array($tipo, $tipos_validos, true)) $tipo = 'tarea';
     if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) $color = '#4af0c8';
@@ -29,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($nombre) && !empty($desc) && !empty($fecha)) {
         try {
             $pdo->prepare("INSERT INTO tareas
-                (id_materia,nombre_tarea,descripcion_tarea,fecha_creacion,fecha_cierre,hora_cierre,tipo_tarea,color,estado)
-                VALUES (?,?,?,NOW(),?,?,?,?,'pendiente')")
-                ->execute([$id_materia,$nombre,$desc,$fecha,$hora.':00',$tipo,$color]);
+                (id_materia,nombre_tarea,descripcion_tarea,fecha_creacion,fecha_cierre,hora_cierre,tipo_tarea,color,link,estado)
+                VALUES (?,?,?,NOW(),?,?,?,?,?,'pendiente')")
+                ->execute([$id_materia,$nombre,$desc,$fecha,$hora.':00',$tipo,$color,$link]);
             header("Location: detalle_materia.php?id_materia={$id_materia}&msg=".urlencode("Actividad creada.")."&type=success");
             exit;
         } catch(PDOException $e) {
