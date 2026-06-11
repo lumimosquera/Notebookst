@@ -1,9 +1,8 @@
 <?php
-
 $dbhost = "localhost";
-$dbuser = "root";
-$dbpassword = "";
-$database = "notbookstbd";
+$dbuser = "notebookst_user";
+$dbpassword = "LSGmed3210";
+$database = "notebookst";
 
 try {
     $pdo = new PDO("mysql:host=$dbhost;dbname=$database;charset=utf8", $dbuser, $dbpassword);
@@ -12,5 +11,4 @@ try {
     echo 'Error de conexión: ' . $e->getMessage();
     exit();
 }
-
 ?>
