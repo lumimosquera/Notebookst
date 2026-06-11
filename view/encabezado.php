@@ -142,9 +142,20 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
         ?>
     </div>
 
-    <div class="topbar-search" id="topbarSearch">
+    <div class="topbar-search" id="topbarSearch" style="position:relative;">
         <i class="bi bi-search" style="color:var(--text-tertiary);font-size:13px;flex-shrink:0;"></i>
-        <input type="text" placeholder="Buscar actividades…" id="globalSearch">
+        <input type="text" placeholder="Buscar actividades…" id="globalSearch"
+               autocomplete="off"
+               oninput="gsDebounce(this.value)"
+               onkeydown="if(event.key==='Escape'){gsClose();this.blur();}"
+               onfocus="if(this.value.trim().length>=2)gsSearch(this.value)">
+        <!-- Search results dropdown -->
+        <div id="gsDropdown" style="
+            display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;
+            background:var(--bg-surface);border:1px solid var(--border);
+            border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+            z-index:99999;max-height:360px;overflow-y:auto;min-width:320px;">
+        </div>
     </div>
 
     <div class="topbar-actions">
@@ -206,3 +217,82 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     </div>
 </header>
 <!-- END TOPBAR -->
+
+<script>
+// ── Búsqueda global ────────────────────────────────────────────
+let _gsTimer = null;
+function gsDebounce(val) {
+    clearTimeout(_gsTimer);
+    const v = val.trim();
+    if (v.length < 2) { gsClose(); return; }
+    _gsTimer = setTimeout(() => gsSearch(v), 280);
+}
+
+async function gsSearch(q) {
+    const drop = document.getElementById('gsDropdown');
+    drop.style.display = 'block';
+    drop.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--text-tertiary);font-family:var(--font-mono);">Buscando…</div>';
+
+    try {
+        const res  = await fetch('../controller/buscar_tareas.php?q=' + encodeURIComponent(q));
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); }
+        catch(pe) {
+            console.error('buscar_tareas respuesta no-JSON:', text);
+            drop.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--status-cancelled);">Error al buscar (respuesta inválida).</div>';
+            return;
+        }
+        if (!data.length) {
+            drop.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--text-tertiary);font-family:var(--font-mono);">Sin resultados para "<strong>' + escGs(q) + '</strong>"</div>';
+            return;
+        }
+        const STATUS = { pendiente:'#f5a623', en_progreso:'#63b3ed', completada:'#4af0c8', cancelada:'#fc5c7d' };
+        const SLABEL = { pendiente:'Pendiente', en_progreso:'En progreso', completada:'Completada', cancelada:'Cancelada' };
+        const EMOJI  = { tarea:'📄', quiz:'📝', parcial:'📋', examen_final:'🎯', proyecto:'🗂', otro:'📌' };
+        drop.innerHTML = data.map(t => `
+            <a href="detalle_materia.php?id_materia=${t.id_materia}&highlight_task=${t.id_tarea}"
+               onclick="gsClose()"
+               style="display:flex;align-items:center;gap:10px;padding:10px 14px;
+                      text-decoration:none;color:var(--text-primary);
+                      border-bottom:1px solid var(--border);transition:background .12s;"
+               onmouseover="this.style.background='var(--bg-hover)'"
+               onmouseout="this.style.background=''">
+                <span style="font-size:16px;flex-shrink:0;">${EMOJI[t.tipo] || '📄'}</span>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${escGs(t.nombre)}
+                    </div>
+                    <div style="font-size:11px;color:${t.mat_color};font-family:var(--font-mono);
+                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${escGs(t.materia)}
+                    </div>
+                </div>
+                <div style="flex-shrink:0;text-align:right;">
+                    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">
+                        ${t.fecha}
+                    </div>
+                    <span style="font-size:10px;color:${STATUS[t.estado] || '#aaa'};font-family:var(--font-mono);">
+                        ● ${SLABEL[t.estado] || t.estado}
+                    </span>
+                </div>
+            </a>`).join('');
+    } catch(e) {
+        drop.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--status-cancelled);">Error al buscar.</div>';
+    }
+}
+
+function gsClose() {
+    const drop = document.getElementById('gsDropdown');
+    if (drop) drop.style.display = 'none';
+}
+
+function escGs(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Cerrar al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#topbarSearch')) gsClose();
+});
+</script>

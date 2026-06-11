@@ -94,13 +94,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── Data ────────────────────────────────────────────────────
 $filter = $_GET['filter'] ?? 'todas';
+$sort   = $_GET['sort']   ?? 'fecha_asc';
 $highlight_task = isset($_GET['highlight_task']) ? intval($_GET['highlight_task']) : 0;
 $types_valid = ['pendiente','en_progreso','completada','cancelada','todas'];
 if (!in_array($filter, $types_valid, true)) $filter = 'todas';
+$sort_map = [
+    'fecha_asc'  => 'fecha_cierre ASC,  hora_cierre ASC',
+    'fecha_desc' => 'fecha_cierre DESC, hora_cierre DESC',
+    'nombre_asc' => 'nombre_tarea ASC',
+    'tipo'       => 'tipo_tarea ASC, fecha_cierre ASC',
+    'estado'     => 'estado ASC, fecha_cierre ASC',
+];
+$order = $sort_map[$sort] ?? $sort_map['fecha_asc'];
 
 $sql = "SELECT * FROM tareas WHERE id_materia = ?";
 if ($filter !== 'todas') $sql .= " AND estado = " . $pdo->quote($filter);
-$sql .= " ORDER BY fecha_cierre ASC, hora_cierre ASC";
+$sql .= " ORDER BY {$order}";
 $stmtT = $pdo->prepare($sql);
 $stmtT->execute([$id_materia]);
 $tareas = $stmtT->fetchAll(PDO::FETCH_ASSOC);
@@ -176,6 +185,60 @@ include_once 'encabezado.php';
         </div>
     </div>
 
+    <!-- Stats cards -->
+    <?php if ($sub['total'] > 0): ?>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;">
+        <?php
+        $canceladas = $sub['total'] - $sub['done'] - $sub['pend'] - $sub['prog'];
+        $stats = [
+            ['label'=>'Total',       'val'=>$sub['total'], 'color'=>'var(--text-tertiary)',   'icon'=>'bi-journal-text'],
+            ['label'=>'Pendientes',  'val'=>$sub['pend'],  'color'=>'var(--status-pending)',  'icon'=>'bi-hourglass-split'],
+            ['label'=>'En progreso', 'val'=>$sub['prog'],  'color'=>'var(--status-progress)', 'icon'=>'bi-arrow-repeat'],
+            ['label'=>'Completadas', 'val'=>$sub['done'],  'color'=>'var(--status-done)',     'icon'=>'bi-check-circle-fill'],
+        ];
+        foreach ($stats as $s): ?>
+        <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;
+                    padding:12px 14px;display:flex;align-items:center;gap:10px;">
+            <i class="bi <?= $s['icon'] ?>" style="font-size:18px;color:<?= $s['color'] ?>;flex-shrink:0;"></i>
+            <div>
+                <div style="font-family:var(--font-display);font-size:20px;font-weight:600;color:<?= $s['color'] ?>;line-height:1.1;">
+                    <?= $s['val'] ?>
+                </div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);margin-top:1px;">
+                    <?= $s['label'] ?>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+        <!-- Progress bar card -->
+        <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;
+                    padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:140px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">Progreso</span>
+                <span style="font-family:var(--font-display);font-size:16px;font-weight:600;
+                             color:<?= htmlspecialchars($materia['color']) ?>;"><?= $pct ?>%</span>
+            </div>
+            <div style="height:6px;background:var(--bg-overlay);border-radius:3px;overflow:hidden;">
+                <div style="width:<?= $pct ?>%;height:100%;background:<?= htmlspecialchars($materia['color']) ?>;
+                            border-radius:3px;transition:.6s;"></div>
+            </div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                <?php
+                $bars = [
+                    [$sub['pend'],  'var(--status-pending)'],
+                    [$sub['prog'],  'var(--status-progress)'],
+                    [$sub['done'],  'var(--status-done)'],
+                ];
+                foreach($bars as [$n,$c]):
+                    $w = $sub['total'] > 0 ? round($n / $sub['total'] * 100) : 0;
+                    if ($w > 0): ?>
+                    <div style="height:3px;width:<?= $w ?>%;background:<?= $c ?>;border-radius:2px;" title="<?= $n ?>"></div>
+                <?php endif; endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Filter bar -->
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;">
         <?php foreach(['todas'=>'Todas','pendiente'=>'Pendiente','en_progreso'=>'En progreso','completada'=>'Completada','cancelada'=>'Cancelada'] as $k=>$label): ?>
@@ -189,13 +252,27 @@ include_once 'encabezado.php';
             <?= $label ?>
         </a>
         <?php endforeach; ?>
-        <?php if ($sub['total'] > 0): ?>
-        <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:10px;">
-            <span style="color:var(--status-pending);">● <?= $sub['pend'] ?> pend.</span>
-            <span style="color:var(--status-progress);">● <?= $sub['prog'] ?> en prog.</span>
-            <span style="color:var(--status-done);">● <?= $sub['done'] ?> lista<?= $sub['done']!=1?'s':''?></span>
-        </span>
-        <?php endif; ?>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+            <i class="bi bi-sort-down" style="font-size:12px;color:var(--text-tertiary);"></i>
+            <select onchange="location.href=this.value"
+                    style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);
+                           background:var(--bg-surface);border:1px solid var(--border);
+                           border-radius:6px;padding:4px 8px;cursor:pointer;outline:none;">
+                <?php
+                $sort_opts = [
+                    'fecha_asc'  => 'Fecha ↑',
+                    'fecha_desc' => 'Fecha ↓',
+                    'nombre_asc' => 'Nombre A–Z',
+                    'tipo'       => 'Tipo',
+                    'estado'     => 'Estado',
+                ];
+                foreach ($sort_opts as $k => $lbl):
+                    $url = '?id_materia='.$id_materia.'&filter='.$filter.'&sort='.$k;
+                ?>
+                <option value="<?= $url ?>" <?= $sort === $k ? 'selected' : '' ?>><?= $lbl ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
     </div>
 
     <!-- Tasks grid -->
