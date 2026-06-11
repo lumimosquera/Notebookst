@@ -18,7 +18,7 @@ $_SESSION['imagen_usuario']  = $imagen_usuario;
 
 // Notificaciones de deadlines próximos
 $stmtNotif = $pdo->prepare("
-    SELECT t.id_tarea, t.id_materia, t.nombre_tarea, t.fecha_cierre, t.hora_cierre, t.tipo_tarea,
+    SELECT t.id_tarea, t.nombre_tarea, t.fecha_cierre, t.hora_cierre, t.tipo_tarea,
            m.nombre_materia
     FROM tareas t
     INNER JOIN materias m ON t.id_materia = m.id_materia
@@ -93,6 +93,10 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                 <span class="nav-icon"><i class="bi bi-check2-square"></i></span>
                 Mis actividades
             </a>
+            <a href="calendario.php" class="nav-item <?= $current_page === 'calendario' ? 'active' : '' ?>">
+                <span class="nav-icon"><i class="bi bi-calendar3"></i></span>
+                Calendario
+            </a>
         </div>
 
         <div class="sidebar-section">
@@ -133,7 +137,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
     <div class="topbar-title">
         <?php
-        $titles = ['home' => 'Dashboard', 'tareas' => 'Mis actividades', 'detalle_materia' => 'Detalle', 'profile' => 'Perfil'];
+        $titles = ['home' => 'Dashboard', 'tareas' => 'Mis actividades', 'calendario' => 'Calendario', 'detalle_materia' => 'Detalle', 'profile' => 'Perfil'];
         echo $titles[$current_page] ?? 'Notebookst';
         ?>
     </div>
@@ -181,21 +185,15 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     <?php foreach ($notificaciones as $n):
                         $urg = getNotifUrgency($n['fecha_cierre'], $n['hora_cierre']);
                     ?>
-                    <div class="notif-item notif-interactive" 
-                         data-task-id="<?= $n['id_tarea'] ?>" 
-                         data-materia-id="<?= $n['id_materia'] ?>"
-                         data-type="task"
-                         onclick="navigateToTask(<?= $n['id_tarea'] ?>, <?= $n['id_materia'] ?>)" 
-                         title="Haz clic para ver esta tarea">
+                    <div class="notif-item">
                         <div class="notif-dot" style="background:<?= $urg['dot'] ?>;margin-top:5px;"></div>
-                        <div style="flex:1;min-width:0;">
+                        <div>
                             <div class="notif-text">
                                 <strong><?= htmlspecialchars($n['nombre_tarea']) ?></strong>
                                 — <?= htmlspecialchars($n['nombre_materia']) ?>
                             </div>
                             <div class="notif-time"><?= $urg['label'] ?></div>
                         </div>
-                        <i class="bi bi-arrow-right" style="font-size:12px;color:var(--text-tertiary);flex-shrink:0;margin-left:8px;opacity:0;transition:opacity .2s;"></i>
                     </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
