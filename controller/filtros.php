@@ -14,7 +14,7 @@ $materias = $stmtMat->fetchAll(PDO::FETCH_ASSOC);
 // Build main query
 $sql = "SELECT t.id_tarea, t.id_materia, t.nombre_tarea, t.descripcion_tarea,
                t.fecha_creacion, t.fecha_cierre, t.hora_cierre, t.tipo_tarea,
-               t.estado, t.color, m.nombre_materia
+               t.estado, t.color, t.link, m.nombre_materia
         FROM tareas t
         INNER JOIN materias m ON t.id_materia = m.id_materia
         WHERE m.id_usuario = :uid";
