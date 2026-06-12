@@ -1,457 +1,431 @@
 <?php
-  session_start();
+session_start();
+require 'model/conexion.php';
 
-  require 'model/conexion.php';
-
-  if (isset($_SESSION['user_id'])) {
-    $records = $pdo->prepare('SELECT id_usuario, usuario, contraseña FROM usuarios WHERE id_usuario = :id_usuario');
-    $records->bindParam(':id_usuario', $_SESSION['user_id']);
-    $records->execute();
-    $results = $records->fetch(PDO::FETCH_ASSOC);
-
-    $user = null;
-
-    if ($results) {
-      $user = $results;
-    }
-  }
+if (isset($_SESSION['user_id'])) {
+    header('Location: view/home.php');
+    exit;
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Notebookst | Ownitech</title>
+    <title>Notebookst — Gestión académica</title>
     <link rel="icon" href="asset/img/N.png">
-    <link rel="stylesheet" href="css/stilo.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
     <style>
-        :root {
-            color-scheme: dark;
-            --bg: #060913;
-            --surface: rgba(8, 20, 40, 0.88);
-            --panel: rgba(10, 19, 35, 0.92);
-            --border: rgba(57, 191, 255, 0.16);
-            --blue: #39b7ff;
-            --purple: #9f66ff;
-            --text: #e7f1ff;
-            --muted: #8da6c7;
-            --accent: #40e0d0;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * {
-            box-sizing: border-box;
-        }
+    :root {
+        --bg:        #080c14;
+        --surface:   #0d1320;
+        --elevated:  #111827;
+        --border:    rgba(255,255,255,.08);
+        --border-hi: rgba(74,240,200,.22);
+        --accent:    #4af0c8;
+        --accent-dim:rgba(74,240,200,.09);
+        --blue:      #63b3ed;
+        --purple:    #a78bfa;
+        --text:      #eef0f5;
+        --muted:     #8a9ab5;
+        --mono:      'DM Mono', monospace;
+        --sans:      'Geist', system-ui, sans-serif;
+        --serif:     'Instrument Serif', Georgia, serif;
+    }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: var(--text);
-            background: radial-gradient(circle at top, rgba(57, 191, 255, 0.14), transparent 28%),
-                radial-gradient(circle at 90% 20%, rgba(159, 102, 255, 0.14), transparent 16%),
-                linear-gradient(180deg, #02050b 0%, #050b16 45%, #060913 100%);
-            display: flex;
-            flex-direction: column;
-        }
+    html { scroll-behavior: smooth; }
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 40px, 40px 100%;
-            pointer-events: none;
-            opacity: 0.4;
-            z-index: 0;
-        }
+    body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-        .navbar {
-            background: rgba(7, 16, 29, 0.96);
-            border-bottom: 1px solid rgba(57, 191, 255, 0.12);
-            z-index: 10;
-        }
+    /* ── Background ── */
+    body::before {
+        content: '';
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background:
+            radial-gradient(ellipse 70% 50% at 10% -10%, rgba(74,240,200,.1) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 90% 10%, rgba(167,139,250,.1) 0%, transparent 55%),
+            radial-gradient(ellipse 60% 60% at 50% 110%, rgba(99,179,237,.07) 0%, transparent 60%);
+    }
+    body::after {
+        content: '';
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        background-image:
+            linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+        background-size: 100% 44px, 44px 100%;
+    }
 
-        .navbar-brand {
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
+    /* ── Navbar ── */
+    .navbar {
+        position: sticky; top: 0; z-index: 100;
+        background: rgba(8,12,20,.85);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(16px);
+        padding: 14px 0;
+    }
+    .navbar-inner {
+        max-width: 1140px; margin: 0 auto; padding: 0 24px;
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .nav-logo {
+        display: flex; align-items: center; gap: 9px;
+        font-family: var(--sans); font-weight: 600; font-size: 15px;
+        color: var(--text); text-decoration: none; letter-spacing: .02em;
+    }
+    .nav-logo-mark {
+        width: 28px; height: 28px; border-radius: 8px;
+        background: var(--accent); display: flex; align-items: center; justify-content: center;
+        font-family: var(--mono); font-size: 13px; font-weight: 700; color: #080c14;
+    }
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-link-ghost {
+        font-size: 13px; color: var(--muted); padding: 7px 14px;
+        border-radius: 8px; text-decoration: none; transition: color .15s, background .15s;
+    }
+    .nav-link-ghost:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .nav-link-accent {
+        font-size: 13px; font-weight: 500; color: #080c14;
+        background: var(--accent); padding: 7px 16px; border-radius: 8px;
+        text-decoration: none; transition: opacity .15s;
+    }
+    .nav-link-accent:hover { opacity: .88; }
 
-        .navbar-nav .nav-link {
-            color: rgba(231, 241, 255, 0.75) !important;
-            transition: color 0.2s ease;
-        }
+    /* ── Sections ── */
+    .section { position: relative; z-index: 1; }
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
 
-        .navbar-nav .nav-link:hover {
-            color: #ffffff !important;
-        }
+    /* ── Hero ── */
+    .hero {
+        padding: 96px 0 80px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero-eyebrow {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+        text-transform: uppercase; color: var(--accent);
+        background: var(--accent-dim); border: 1px solid var(--border-hi);
+        padding: 5px 12px; border-radius: 999px; margin-bottom: 22px;
+    }
+    .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
 
-        .hero {
-            position: relative;
-            overflow: hidden;
-            padding: 5.5rem 0 4rem;
-            z-index: 1;
-        }
+    .hero h1 {
+        font-family: var(--serif); font-size: clamp(2.4rem, 4.5vw, 4rem);
+        line-height: 1.05; letter-spacing: -.02em; margin-bottom: 20px; color: var(--text);
+    }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+        font-size: 16px; color: var(--muted); line-height: 1.7;
+        max-width: 480px; margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+    .btn-primary-idx {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: var(--accent); color: #080c14; font-weight: 600; font-size: 14px;
+        padding: 11px 22px; border-radius: 10px; text-decoration: none;
+        box-shadow: 0 8px 30px rgba(74,240,200,.25); transition: opacity .15s, transform .15s;
+    }
+    .btn-primary-idx:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-ghost-idx {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: rgba(255,255,255,.05); color: var(--text); font-size: 14px;
+        padding: 11px 22px; border-radius: 10px; border: 1px solid var(--border);
+        text-decoration: none; transition: border-color .15s, background .15s;
+    }
+    .btn-ghost-idx:hover { border-color: var(--border-hi); background: rgba(74,240,200,.06); }
 
-        .hero::after {
-            content: '';
-            position: absolute;
-            inset: -20% 0 20%;
-            background: radial-gradient(circle at 50% 20%, rgba(57, 191, 255, 0.22), transparent 30%);
-            filter: blur(60px);
-            pointer-events: none;
-        }
+    .hero-stats {
+        display: flex; flex-wrap: wrap; gap: 20px;
+        border-top: 1px solid var(--border); padding-top: 28px;
+    }
+    .hero-stat { display: flex; flex-direction: column; gap: 3px; }
+    .hero-stat-val { font-family: var(--serif); font-size: 22px; color: var(--text); }
+    .hero-stat-lbl { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
 
-        .hero .eyebrow {
-            display: inline-flex;
-            padding: 0.65rem 1rem;
-            border: 1px solid rgba(57, 191, 255, 0.18);
-            border-radius: 999px;
-            text-transform: uppercase;
-            letter-spacing: 0.18em;
-            color: var(--blue);
-            background: rgba(57, 191, 255, 0.06);
-            margin-bottom: 1.6rem;
-            font-size: 0.8rem;
-        }
+    /* ── Mock UI card ── */
+    .hero-visual {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 18px; overflow: hidden;
+        box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(74,240,200,.06);
+    }
+    .mock-topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px; background: var(--elevated);
+        border-bottom: 1px solid var(--border);
+    }
+    .mock-dots { display: flex; gap: 6px; }
+    .mock-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .mock-title { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .mock-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .mock-card {
+        background: var(--elevated); border: 1px solid var(--border);
+        border-radius: 10px; padding: 11px 13px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .mock-card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mock-card-body { flex: 1; min-width: 0; }
+    .mock-card-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .mock-card-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .mock-badge {
+        font-family: var(--mono); font-size: 9px; padding: 2px 7px;
+        border-radius: 4px; flex-shrink: 0;
+    }
+    .mock-progress { padding: 12px 16px; border-top: 1px solid var(--border); }
+    .mock-progress-label { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .mock-progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .mock-progress-fill { height: 100%; border-radius: 2px; background: var(--accent); }
 
-        .hero h1 {
-            font-size: clamp(2.6rem, 5vw, 4.8rem);
-            line-height: 0.95;
-            margin-bottom: 1rem;
-            letter-spacing: -0.04em;
-        }
+    /* ── Features ── */
+    .features { padding: 80px 0; }
+    .section-eyebrow {
+        font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+        text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+    }
+    .section-title {
+        font-family: var(--serif); font-size: clamp(1.8rem, 3vw, 2.5rem);
+        line-height: 1.1; color: var(--text); margin-bottom: 14px; letter-spacing: -.02em;
+    }
+    .section-sub { font-size: 15px; color: var(--muted); max-width: 520px; line-height: 1.7; margin-bottom: 48px; }
 
-        .hero h1 .highlight {
-            color: var(--purple);
-        }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature-card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 14px; padding: 22px;
+        transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { border-color: var(--border-hi); transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,.25); }
+    .feature-icon {
+        width: 40px; height: 40px; border-radius: 10px;
+        background: var(--accent-dim); border: 1px solid var(--border-hi);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--accent); font-size: 17px; margin-bottom: 14px;
+    }
+    .feature-card h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-        .hero p.lead {
-            font-size: 1.1rem;
-            color: var(--muted);
-            max-width: 680px;
-            margin-bottom: 2rem;
-        }
+    /* ── CTA ── */
+    .cta-section {
+        padding: 80px 0;
+        text-align: center;
+    }
+    .cta-box {
+        background: var(--surface); border: 1px solid var(--border-hi);
+        border-radius: 20px; padding: 56px 40px;
+        max-width: 600px; margin: 0 auto;
+        box-shadow: 0 0 80px rgba(74,240,200,.06);
+    }
+    .cta-box h2 { font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.2rem); line-height: 1.15; margin-bottom: 14px; }
+    .cta-box h2 em { font-style: italic; color: var(--accent); }
+    .cta-box p { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.7; }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3fb7ff 0%, #7d5fff 100%);
-            border: none;
-            box-shadow: 0 18px 40px rgba(63, 183, 255, 0.24);
-        }
+    /* ── Footer ── */
+    footer {
+        border-top: 1px solid var(--border);
+        padding: 24px 0; text-align: center;
+        font-family: var(--mono); font-size: 11px; color: var(--muted);
+        position: relative; z-index: 1;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
 
-        .btn-outline-light {
-            border-color: rgba(255, 255, 255, 0.18);
-            color: #f8fbff;
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .hero-visual {
-            position: relative;
-            background: rgba(7, 13, 27, 0.88);
-            border: 1px solid rgba(57, 191, 255, 0.18);
-            border-radius: 2rem;
-            padding: 2rem;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
-            backdrop-filter: blur(10px);
-        }
-
-        .visual-frame {
-            border: 1px solid rgba(57, 191, 255, 0.2);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            background: rgba(3, 8, 18, 0.9);
-        }
-
-        .visual-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-            color: var(--muted);
-            font-size: 0.95rem;
-        }
-
-        .visual-header span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.65rem;
-        }
-
-        .terminal-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            color: rgba(158, 214, 255, 0.9);
-        }
-
-        .terminal-list li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.98rem;
-            line-height: 1.65;
-        }
-
-        .terminal-list li::before {
-            content: '›';
-            position: absolute;
-            left: 0;
-            top: 0;
-            color: var(--blue);
-        }
-
-        .feature-card {
-            background: rgba(8, 16, 33, 0.86);
-            border: 1px solid rgba(63, 183, 255, 0.1);
-            border-radius: 1.5rem;
-            padding: 1.8rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.24);
-        }
-
-        .feature-card h3 {
-            color: #ffffff;
-            margin-bottom: 0.8rem;
-        }
-
-        .feature-card p {
-            color: var(--muted);
-        }
-
-        .feature-icon {
-            display: inline-flex;
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            justify-content: center;
-            align-items: center;
-            background: rgba(57, 191, 255, 0.14);
-            color: var(--blue);
-            margin-bottom: 1rem;
-        }
-
-        .floating_menu {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 11;
-        }
-
-        .menu {
-            background: linear-gradient(135deg, #3fb7ff, #7d5fff);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 18px 28px rgba(63, 183, 255, 0.26);
-        }
-
-        .menu i {
-            color: #fff;
-            font-size: 1.2rem;
-        }
-
-        .sud_menu {
-            position: absolute;
-            right: 0;
-            bottom: 72px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(15px);
-            transition: transform 0.25s ease, opacity 0.25s ease;
-        }
-
-        .floating_menu.active .sud_menu {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .sud_menu a {
-            width: 48px;
-            height: 48px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(57, 191, 255, 0.14);
-            color: var(--text);
-            transition: background 0.2s ease;
-        }
-
-        .sud_menu a:hover {
-            background: rgba(57, 191, 255, 0.18);
-        }
-
-        footer {
-            background: rgba(4, 10, 20, 0.98);
-            padding: 1.2rem 0;
-            color: rgba(231, 241, 255, 0.74);
-        }
-
-        footer p {
-            margin: 0;
-            font-size: 0.95rem;
-        }
-
-        .feature-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.65rem 1rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        .feature-pill strong {
-            color: #fff;
-        }
-
-        @media (max-width: 991px) {
-            .hero {
-                padding-top: 4.5rem;
-            }
-
-            .hero-visual {
-                margin-top: 2rem;
-            }
-        }
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .hero { grid-template-columns: 1fr; gap: 40px; padding: 64px 0 56px; }
+        .hero-visual { display: none; }
+        .features-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+        .features-grid { grid-template-columns: 1fr; }
+        .cta-box { padding: 36px 20px; }
+        .hero { padding: 56px 0 48px; }
+    }
     </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Notebookst</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="view/registro.php">Registrarse</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="view/login.php">Iniciar sesión</a>
-                    </li>
-                </ul>
+
+<!-- NAVBAR -->
+<nav class="navbar section">
+    <div class="navbar-inner">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">N</div>
+            Notebookst
+        </a>
+        <div class="nav-links">
+            <a href="view/login.php"    class="nav-link-ghost">Iniciar sesión</a>
+            <a href="view/registro.php" class="nav-link-accent">Comenzar gratis</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="section">
+<div class="container">
+<div class="hero">
+    <div>
+        <div class="hero-eyebrow">
+            <span class="hero-eyebrow-dot"></span>
+            Gestión académica
+        </div>
+        <h1>Organiza tu semestre,<br><em>sin perder ninguna entrega.</em></h1>
+        <p class="hero-sub">
+            Notebookst centraliza tus materias, tareas y fechas límite en un dashboard limpio.
+            Visualiza tu progreso, recibe alertas de vencimiento y lleva el control de cada actividad.
+        </p>
+        <div class="hero-actions">
+            <a href="view/registro.php" class="btn-primary-idx">
+                <i class="bi bi-arrow-right-circle-fill"></i> Crear cuenta gratis
+            </a>
+            <a href="view/login.php" class="btn-ghost-idx">
+                <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-val">Materias</span>
+                <span class="hero-stat-lbl">por semestre</span>
             </div>
-        </div>
-    </nav>
-
-    <main class="hero">
-        <div class="container position-relative">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <span class="eyebrow">OWNITECH · DARKBALL EXPERIENCE</span>
-                    <h1>Tu estudio digital con potencia <span class="highlight">futurista</span>.</h1>
-                    <p class="lead">Notebookst reúne notas, tareas y proyectos en una interfaz oscura, elegante y lista para tus ideas más avanzadas.</p>
-
-                    <div class="d-flex flex-wrap gap-3 mt-4">
-                        <a href="view/registro.php" class="btn btn-primary btn-lg">Comenzar</a>
-                        <a href="view/login.php" class="btn btn-outline-light btn-lg">Iniciar sesión</a>
-                    </div>
-
-                    <div class="d-flex flex-wrap gap-3 mt-5">
-                        <span class="feature-pill"><strong>Seguridad</strong> cifrada</span>
-                        <span class="feature-pill"><strong>Notas</strong> organizadas</span>
-                        <span class="feature-pill"><strong>Interfaz</strong> Darkball</span>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="hero-visual">
-                        <div class="visual-frame">
-                            <div class="visual-header">
-                                <span>Notebookst</span>
-                                <span><i class="fas fa-circle" style="color:#39b7ff"></i> Live</span>
-                            </div>
-                            <ul class="terminal-list">
-                                <li>Inicio de sesión seguro activado</li>
-                                <li>Espacio de notas acelerado</li>
-                                <li>Panel de tareas optimizado</li>
-                                <li>Sincronización de ideas en tiempo real</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div class="hero-stat">
+                <span class="hero-stat-val">Tareas</span>
+                <span class="hero-stat-lbl">con fechas y enlaces</span>
             </div>
-        </div>
-    </main>
-
-    <section class="py-5">
-        <div class="container">
-            <div class="row gy-4">
-                <div class="col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
-                        <h3>Ideas claras</h3>
-                        <p>Encuentra la motivación para escribir, anotar y llevar tu productividad a otro nivel.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-tasks"></i></div>
-                        <h3>Control total</h3>
-                        <p>Puedes administrar tareas con prioridad y estado, todo dentro de una vista moderna y simple.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                        <h3>Protegido</h3>
-                        <p>Tu contenido se mantiene confiable y accesible en un entorno pensado para usuarios exigentes.</p>
-                    </div>
-                </div>
+            <div class="hero-stat">
+                <span class="hero-stat-val">Calendario</span>
+                <span class="hero-stat-lbl">mes · semana · día</span>
             </div>
-        </div>
-    </section>
-
-    <div class="floating_menu" id="FloatMenu">
-        <div class="menu" onclick="toggleMenu()">
-            <i class="fas fa-plus"></i>
-        </div>
-        <div class="sud_menu">
-            <a href="index.php" title="Inicio"><i class="fas fa-home"></i></a>
-            <a href="view/login.php" title="Login"><i class="fas fa-sign-in-alt"></i></a>
-            <a href="view/registro.php" title="Registro"><i class="fas fa-user-plus"></i></a>
+            <div class="hero-stat">
+                <span class="hero-stat-val">Alertas</span>
+                <span class="hero-stat-lbl">72 h antes del vencimiento</span>
+            </div>
         </div>
     </div>
 
-    <footer>
-        <div class="container text-center">
-            <p>&copy; <?= date('Y') ?> Notebookst by OwniTech. Todos los derechos reservados.</p>
+    <!-- Mock UI -->
+    <div class="hero-visual">
+        <div class="mock-topbar">
+            <div class="mock-dots">
+                <div class="mock-dot" style="background:#fc5c7d;"></div>
+                <div class="mock-dot" style="background:#f5a623;"></div>
+                <div class="mock-dot" style="background:#4af0c8;"></div>
+            </div>
+            <div class="mock-title">notebookst · dashboard</div>
+            <div style="width:9px;"></div>
         </div>
-    </footer>
+        <div class="mock-body">
+            <div class="mock-card">
+                <div class="mock-card-dot" style="background:#63b3ed;"></div>
+                <div class="mock-card-body">
+                    <div class="mock-card-name">📝 Quiz Unidad 3</div>
+                    <div class="mock-card-meta">Cálculo diferencial · 16/06/2026</div>
+                </div>
+                <div class="mock-badge" style="background:rgba(245,166,35,.18);color:#f5a623;">Pendiente</div>
+            </div>
+            <div class="mock-card">
+                <div class="mock-card-dot" style="background:#a78bfa;"></div>
+                <div class="mock-card-body">
+                    <div class="mock-card-name">🗂 Proyecto final</div>
+                    <div class="mock-card-meta">Ing. de software · 25/06/2026</div>
+                </div>
+                <div class="mock-badge" style="background:rgba(99,179,237,.18);color:#63b3ed;">En progreso</div>
+            </div>
+            <div class="mock-card">
+                <div class="mock-card-dot" style="background:#4af0c8;"></div>
+                <div class="mock-card-body">
+                    <div class="mock-card-name">📋 Parcial 2</div>
+                    <div class="mock-card-meta">Física mecánica · 10/06/2026</div>
+                </div>
+                <div class="mock-badge" style="background:rgba(74,240,200,.15);color:#4af0c8;">Completada</div>
+            </div>
+        </div>
+        <div class="mock-progress">
+            <div class="mock-progress-label">
+                <span>Progreso del semestre</span>
+                <span style="color:var(--accent);">67%</span>
+            </div>
+            <div class="mock-progress-bar">
+                <div class="mock-progress-fill" style="width:67%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        function toggleMenu() {
-            document.getElementById('FloatMenu').classList.toggle('active');
-        }
-    </script>
+<!-- FEATURES -->
+<div class="section features">
+<div class="container">
+    <div class="section-eyebrow">Funcionalidades</div>
+    <h2 class="section-title">Todo lo que necesitas<br>para el semestre.</h2>
+    <p class="section-sub">Desde crear una materia hasta ver qué entregas tienes esta semana — sin complicaciones.</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-journal-bookmark-fill"></i></div>
+            <h3>Materias organizadas</h3>
+            <p>Crea una materia por cada clase, asígnale un color y gestiona todas sus actividades desde un solo lugar.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-check2-square"></i></div>
+            <h3>Actividades detalladas</h3>
+            <p>Tareas, quizzes, parciales, proyectos. Cada actividad tiene nombre, descripción, fecha, hora y enlace directo.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-calendar3"></i></div>
+            <h3>Calendario trimodal</h3>
+            <p>Visualiza tus entregas en vista de mes, semana o día. Navega el tiempo y filtra por estado o materia.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-bell-fill"></i></div>
+            <h3>Alertas de vencimiento</h3>
+            <p>Recibe notificaciones en el topbar cuando una entrega vence en menos de 72 horas. Nunca más te sorprenda una fecha.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            <h3>Estadísticas por materia</h3>
+            <p>Mira de un vistazo cuántas actividades tienes pendientes, en progreso o completadas en cada materia.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-search"></i></div>
+            <h3>Búsqueda global</h3>
+            <p>Encuentra cualquier tarea o materia desde el buscador del topbar. Resultados instantáneos con acceso directo.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- CTA -->
+<div class="section cta-section">
+<div class="container">
+    <div class="cta-box">
+        <h2>Empieza <em>ahora mismo</em><br>y organiza tu semestre.</h2>
+        <p>Crear una cuenta es gratis y toma menos de un minuto.<br>Sin tarjeta, sin complicaciones.</p>
+        <a href="view/registro.php" class="btn-primary-idx" style="display:inline-flex;">
+            <i class="bi bi-arrow-right-circle-fill"></i> Crear cuenta gratis
+        </a>
+    </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p>
+            &copy; <?= date('Y') ?> <strong style="color:var(--text);">Notebookst</strong> by OwniTech &nbsp;·&nbsp;
+            <a href="view/login.php">Iniciar sesión</a> &nbsp;·&nbsp;
+            <a href="view/registro.php">Registrarse</a>
+        </p>
+    </div>
+</footer>
+
 </body>
-
 </html>
